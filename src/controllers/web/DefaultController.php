@@ -5,6 +5,7 @@ namespace portalium\notification\controllers\web;
 use portalium\notification\models\Notification;
 use portalium\notification\models\NotificationSearch;
 use portalium\web\Controller;
+use portalium\notification\Module;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -38,6 +39,10 @@ class DefaultController extends Controller
      */
     public function actionIndex()
     {
+        if (!\Yii::$app->user->can('notificationWebDefaultIndex') ) {
+            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        }
+
         $searchModel = new NotificationSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
@@ -129,6 +134,6 @@ class DefaultController extends Controller
             return $model;
         }
 
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        throw new NotFoundHttpException(Module::t('The requested page does not exist.'));
     }
 }
