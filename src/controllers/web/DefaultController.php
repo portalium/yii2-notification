@@ -2,6 +2,7 @@
 
 namespace portalium\notification\controllers\web;
 
+use portalium\menu\Module;
 use portalium\notification\models\Notification;
 use portalium\notification\models\NotificationSearch;
 use portalium\web\Controller;
@@ -67,6 +68,11 @@ class DefaultController extends Controller
      */
     public function actionCreate()
     {
+        //mesaj oluşturmaya yetkin var mı yok mu kontrol ediyor.
+        if (!\Yii::$app->user->can('notificationWebDefaultCreate')) {
+            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        }
+
         $model = new Notification();
 
         if ($this->request->isPost) {
@@ -89,8 +95,16 @@ class DefaultController extends Controller
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
+
+    //hangi mesajı güncelleyeceksin id'si ile bul
     public function actionUpdate($id_notification)
     {
+        //update işlemi için yetkin var mı yok mu kontrol ediliyor yoksa exception fırlatılıyor
+        if (!\Yii::$app->user->can('notificationWebDefaultUpdate', ['model' => $this->findModel($id_notification)])) {
+            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        }
+
+        //hangi satırı güncelleyeceksen o satırı bul ve modele ata
         $model = $this->findModel($id_notification);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
@@ -111,6 +125,26 @@ class DefaultController extends Controller
      */
     public function actionDelete($id_notification)
     {
+
+        Notification::find()->where([ 'id_to'  => Yii::$app->user->id ])->all();
+
+        if(\Yii::$app->user->can('notificationWebDefaultDelete',['model' => $this->findModel($id_notification)]))
+        {
+            $this->findModel($id_notification)->delete();
+            return $this->redirect(['index']);
+        }
+        else if(\Yii::$app->user->can('notificationWebDefaultDeleteOwn',['model' => $this->findModel($id_notification)]))
+        {
+            $id_user->Yii::$app->user;
+
+        }
+
+
+        //kullanıcının hem silme yetkisi var mı hem de sadece kendi mesajını silme yetkisi var mı onu kontrol ediyoruz
+        if (!\Yii::$app->user->can('notificationWebDefaultDelete' , ['model' => $this->findModel($id_notification)])) {
+            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        }
+
         $this->findModel($id_notification)->delete();
 
         return $this->redirect(['index']);
