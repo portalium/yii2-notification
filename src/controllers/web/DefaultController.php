@@ -8,6 +8,7 @@ use portalium\web\Controller;
 use portalium\notification\Module;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use Yii;
 
 /**
  * DefaultController implements the CRUD actions for Notification model.
@@ -39,12 +40,14 @@ class DefaultController extends Controller
      */
     public function actionIndex()
     {
-        if (!\Yii::$app->user->can('notificationWebDefaultIndex') ) {
+        if (!\Yii::$app->user->can('notificationWebDefaultIndex') && !\Yii::$app->user->can('notificationWebDefaultIndexOwn')){
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
 
         $searchModel = new NotificationSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+        if(!\Yii::$app->user->can('notificationWebDefaultIndex'))
+            $dataProvider->query->andWhere(['id_to'  => Yii::$app->user->id]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
