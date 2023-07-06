@@ -6,7 +6,6 @@ use portalium\menu\Module;
 use portalium\notification\models\Notification;
 use portalium\notification\models\NotificationSearch;
 use portalium\web\Controller;
-use yii\debug\panels\EventPanel;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
