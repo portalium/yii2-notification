@@ -56,9 +56,36 @@ class DefaultController extends Controller
      */
     public function actionView($id_notification)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id_notification),
-        ]);
+        //tüm bildirimleri görme yetkisi var mı kontrol
+        if(\Yii::$app->user->can('notificationWebDefaultIndex '))
+        {
+            return $this->render('view', [
+                'model' => $this->findModel($id_notification),
+            ]);
+        }
+
+        //sadece kendi bildirimlerini görmeye yetkisi varsa
+        elseif(\Yii::$app->user->can('notificationWebDefaultIndexOwn'))
+        {
+            //sisteme giriş yapan kullancının bildirimini notification değişkenine atadım
+            $notification= Notification::find()->where([ 'id_to'  => Yii::$app->user->id,'id_notification'=>$id_notification ])->one();
+
+            //eğer kendine ait bildirim varsa
+            if($notification)
+            {
+                //bildirimi görüntüle
+                return $this->render('view', [
+                    'model'=>$notification,
+                ]);
+            }
+
+        }
+
+        //bildirim görüntüleme yetkisi yoksa
+        else
+        {
+            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        }
     }
 
     /**
@@ -100,7 +127,7 @@ class DefaultController extends Controller
     public function actionUpdate($id_notification)
     {
         //update işlemi için yetkin var mı yok mu kontrol ediliyor yoksa exception fırlatılıyor
-        if (!\Yii::$app->user->can('notificationWebDefaultUpdate', ['model' => $this->findModel($id_notification)])) {
+        if (!\Yii::$app->user->can('notificationWebDefaultUpdate')) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
 
@@ -126,28 +153,31 @@ class DefaultController extends Controller
     public function actionDelete($id_notification)
     {
 
-        Notification::find()->where([ 'id_to'  => Yii::$app->user->id ])->all();
-
-        if(\Yii::$app->user->can('notificationWebDefaultDelete',['model' => $this->findModel($id_notification)]))
+        //silme yetkin var mı kontrol ediliyor varsa istediğin kullanıcının bildirimini silebiilirsin
+        if(\Yii::$app->user->can('notificationWebDefaultDelete'))
         {
             $this->findModel($id_notification)->delete();
             return $this->redirect(['index']);
         }
-        else if(\Yii::$app->user->can('notificationWebDefaultDeleteOwn',['model' => $this->findModel($id_notification)]))
+        //sadece kendi bildirimini silebilsin
+        else if(\Yii::$app->user->can('notificationWebDefaultDeleteOwn'))
         {
-            $id_user->Yii::$app->user;
+            //sisteme giriş yapan kullancının bildirimlerini notifications değişkenine atadım
+            $notification= Notification::find()->where([ 'id_to'  => Yii::$app->user->id , 'id_notification'=>$id_notification])->one();
 
+            //eğer kendine ait bir bildirim varsa
+            if($notification)
+            {
+               $notification->delete();
+                return $this->redirect(['index']);
+            }
         }
-
-
-        //kullanıcının hem silme yetkisi var mı hem de sadece kendi mesajını silme yetkisi var mı onu kontrol ediyoruz
-        if (!\Yii::$app->user->can('notificationWebDefaultDelete' , ['model' => $this->findModel($id_notification)])) {
+        //kullanıcı hiçbir izne sahip değilse exception yollanıyor
+        else
+        {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
 
-        $this->findModel($id_notification)->delete();
-
-        return $this->redirect(['index']);
     }
 
     /**
