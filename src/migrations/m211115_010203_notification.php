@@ -43,19 +43,11 @@ class m211115_010203_notification extends Migration
             'CASCADE'
         );
 
-      /*  $this->addForeignKey(
-            'fk-id_notification',
-            'type',
-            'id_to',
-            'text',
-            'title',
-            'CASCADE'
-        );*/
     }
 
     public function safeDown()
     {
-        $this->dropTable('{{%notification_notification}}');
+        $this->dropTable('{{%' . Module::$tablePrefix . 'notification}}');
     }
 }
 ?>
