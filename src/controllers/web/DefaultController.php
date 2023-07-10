@@ -2,7 +2,6 @@
 
 namespace portalium\notification\controllers\web;
 
-use portalium\menu\Module;
 use portalium\notification\models\Notification;
 use portalium\notification\models\NotificationSearch;
 use portalium\web\Controller;

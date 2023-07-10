@@ -2,6 +2,7 @@
 
 namespace portalium\notification\models;
 
+use portalium\user\models\User;
 use Yii;
 use portalium\notification\Module;
 
@@ -59,5 +60,10 @@ class Notification extends \yii\db\ActiveRecord
             'text' => 'Text',
             'title' => 'Title',
         ];
+    }
+
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id_user' => 'id_to']);
     }
 }
