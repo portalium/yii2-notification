@@ -16,7 +16,6 @@ class Notification extends Widget
     public function init()
     {
         parent::init();
-
     }
 
     //contain the code that generates the rendering result of the widget
@@ -37,9 +36,17 @@ class Notification extends Widget
             'display' => $this->display,
         ];
 
-        return Nav::widget([
-            'options' => $this->options,
-            'items' => $menuItems,
-        ]);
+
+        return $this->render('
+        notification_list'
+            //, [
+//            'options' => $this->options,
+//            'items' => $menuItems,
+//        ]
+);
+//        return Nav::widget([
+//            'options' => $this->options,
+//            'items' => $menuItems,
+//        ]);
     }
 }
