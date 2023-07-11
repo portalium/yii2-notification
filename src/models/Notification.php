@@ -66,4 +66,14 @@ class Notification extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id_user' => 'id_to']);
     }
+
+    public static function getUserList()
+    {
+        $items = [];
+        $users = User::find()->all();
+        foreach ($users as $user) {
+            $items[$user->id_user] = $user->first_name. " " .$user->last_name;
+        }
+        return $items;
+    }
 }

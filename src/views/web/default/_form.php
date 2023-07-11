@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use portalium\theme\widgets\ActiveForm;
 use portalium\theme\widgets\Panel;
 use portalium\notification\Module;
+use portalium\notification\models\Notification;
 
 /** @var yii\web\View $this */
 /** @var portalium\notification\models\Notification $model */
@@ -23,7 +24,7 @@ use portalium\notification\Module;
     ],
 ]) ?>
 <?= $form->field($model, 'type')->textInput() ?>
-<?= $form->field($model, 'id_to')->textInput() ?>
+<?= $form->field($model, 'id_to')->dropDownList(Notification::getUserList())->label('User') ?>
 <?= $form->field($model, 'text')->textInput(['maxlength' => true]) ?>
 <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
