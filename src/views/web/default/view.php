@@ -1,7 +1,11 @@
 <?php
 
-use yii\helpers\Html;
+use portalium\theme\helpers\Html;
 use yii\widgets\DetailView;
+use portalium\theme\widgets\Panel;
+use portalium\notification\Module;
+
+
 
 /** @var yii\web\View $this */
 /** @var portalium\notification\models\Notification $model */
@@ -11,29 +15,32 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Notifications'), 'ur
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="notification-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+<?php Panel::begin([
+    'title' => $model->title,
+    'actions' => [
+        'header' => [
+            Html::a(Module::t(''), ['update', 'id_notification' => $model->id_notification], ['class' => 'fa fa-pencil btn btn-primary']),
+            Html::a(Module::t(''), ['delete', 'id_notification' => $model->id_notification], [
+                'class' => 'fa fa-trash btn btn-danger',
+                'data' => [
+                    'confirm' => Module::t( 'Are you sure you want to delete this item?'),
+                    'method' => 'post',
+                ],
+            ]),
+        ]
+    ]
+]) ?>
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Update'), ['update', 'id_notification' => $model->id_notification], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id_notification' => $model->id_notification], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id_notification',
-            'type',
-            'id_to',
-            'text',
-            'title',
-        ],
-    ]) ?>
-</div>
+<?= DetailView::widget([
+    'model' => $model,
+    'attributes' => [
+        'id_notification',
+        'type',
+        'id_to',
+        'text',
+        'title',
+    ],
+]) ?>
+<?php Panel::end() ?>
