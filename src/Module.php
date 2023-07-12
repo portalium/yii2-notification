@@ -34,4 +34,18 @@ class Module extends \portalium\base\Module
             ]
         ];
     }
+
+    public function getMenuItems(){
+        $menuItems = [
+            [
+                [
+                    'menu' => 'web',
+                    'type' => 'widget',
+                    'label' => 'portalium\notification\widgets\Notification',
+                    'name' => 'notification',
+                ]
+            ],
+        ];
+        return $menuItems;
+    }
 }

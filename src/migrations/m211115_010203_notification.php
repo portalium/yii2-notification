@@ -2,6 +2,7 @@
 
 use yii\db\Schema;
 use yii\db\Migration;
+use portalium\user\Module as UserModule;
 use portalium\notification\Module;
 
 
@@ -12,16 +13,6 @@ class m211115_010203_notification extends Migration
         $tableOptions = 'ENGINE=InnoDB';
 
         $this->createTable(
-            Module::$tablePrefix . "read",
-            [
-                'id_read'=> $this->primaryKey(),
-                'id_user'=> $this->integer()->notNull(),
-                'created_at' => $this->dateTime()->notNull(),
-            ],
-            $tableOptions
-        );
-
-        $this->createTable(
             Module::$tablePrefix . "notification",
             [
                 'id_notification'=> $this->primaryKey(),
@@ -29,33 +20,25 @@ class m211115_010203_notification extends Migration
                 'id_to'=> $this->integer()->notNull(),
                 'text'=> $this->string()->notNull(),
                 'title'=> $this->string()->notNull(),
-                
+
             ],
             $tableOptions
         );
 
+
         $this->addForeignKey(
-            'fk-id_read',
-            'notification_read',
-            'id_user',
-            'user_user',
+            '{{%fk-' . Module::$tablePrefix . 'id_user}}',
+            '{{%' . Module::$tablePrefix . 'notification}}',
+            'id_to',
+            '{{%' . UserModule::$tablePrefix . 'user}}',
             'id_user',
             'CASCADE'
         );
-
-      /*  $this->addForeignKey(
-            'fk-id_notification',
-            'type',
-            'id_to',
-            'text',
-            'title',
-            'CASCADE'
-        );*/
     }
 
     public function safeDown()
     {
-        $this->dropTable('{{%notification_notification}}');
+        $this->dropTable('{{%' . Module::$tablePrefix . 'notification}}');
     }
 }
 ?>

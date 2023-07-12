@@ -1,20 +1,17 @@
 <?php
 
 use yii\helpers\Html;
+use portalium\notification\Module;
 
 /** @var yii\web\View $this */
 /** @var portalium\notification\models\Notification $model */
 
 $this->title = Yii::t('app', 'Create Notification');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Notifications'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Module::t('Notifications'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="notification-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+<?= $this->render('_form', [
+    'model' => $model,
+]) ?>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
-
-</div>

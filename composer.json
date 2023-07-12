@@ -1,5 +1,5 @@
 {
-	"name" : "portalium/portalium-notification",
+	"name" : "portalium/yii2-notification",
 	"description" : "Module notification for Portalium",
 	"type" : "portalium-core",
 	"license": "MIT",
@@ -12,7 +12,7 @@
 		}
 	],
 	"support" : {
-		"issues" : "https://github.com/portalium/portalium-notification/issues"
+		"issues" : "https://github.com/portalium/yii2-notification/issues"
 	},
 	"autoload" : {
 		"psr-4" : {
