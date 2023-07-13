@@ -2,8 +2,6 @@
 
 namespace portalium\notification\widgets;
 
-
-use portalium\theme\widgets\Nav;
 use portalium\notification\models\Notification as notificationModel;
 use yii\base\Widget;
 use portalium\notification\Module;
@@ -37,16 +35,6 @@ class Notification extends Widget
         ];
 
 
-        return $this->render('
-        notification_list'
-            //, [
-//            'options' => $this->options,
-//            'items' => $menuItems,
-//        ]
-);
-//        return Nav::widget([
-//            'options' => $this->options,
-//            'items' => $menuItems,
-//        ]);
+       return $this->render('notifications');
     }
 }
