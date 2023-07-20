@@ -17,10 +17,10 @@ class notificationAsset extends AssetBundle
         'css/notification.css',
     ];
 
-//
-//    public $publishOptions = [
-//        'forceCopy' => YII_DEBUG,
-//    ];
+
+    public $publishOptions = [
+        'forceCopy' => YII_DEBUG,
+    ];
 
     public function init()
     {

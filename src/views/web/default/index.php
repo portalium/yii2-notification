@@ -42,7 +42,6 @@ Panel::begin([
     'columns' => [
         ['class' => 'yii\grid\SerialColumn'],
 
-        'id_notification',
         'type',
         'user.username',
         'text',

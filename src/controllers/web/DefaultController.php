@@ -10,14 +10,8 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use Yii;
 
-/**
- * DefaultController implements the CRUD actions for Notification model.
- */
 class DefaultController extends Controller
 {
-    /**
-     * @inheritDoc
-     */
     public function behaviors()
     {
         return array_merge(
@@ -32,22 +26,15 @@ class DefaultController extends Controller
             ]
         );
     }
-
-    /**
-     * Lists all Notification models.
-     *
-     * @return string
-     */
     public function actionIndex()
     {
-        if (!\Yii::$app->user->can('notificationWebDefaultIndex') && !\Yii::$app->user->can('notificationWebDefaultIndexOwn')){
+        if (!\Yii::$app->user->can('notificationWebDefaultIndex') && !\Yii::$app->user->can('notificationWebDefaultIndexOwn')) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
-
-        $searchModel = new NotificationSearch();
+        $searchModel = new NotificationSearch;
         $dataProvider = $searchModel->search($this->request->queryParams);
         if(!\Yii::$app->user->can('notificationWebDefaultIndex'))
-            $dataProvider->query->andWhere(['id_to'  => Yii::$app->user->id]);
+            $dataProvider->query->andWhere(['id_to'=>\Yii::$app->user->id]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -55,54 +42,21 @@ class DefaultController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single Notification model.
-     * @param int $id_notification Id Notification
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionView($id_notification)
     {
-        //tüm bildirimleri görme yetkisi var mı kontrol
-        if(\Yii::$app->user->can('notificationWebDefaultIndex '))
-        {
-            return $this->render('view', [
-                'model' => $this->findModel($id_notification),
-            ]);
-        }
-
-        //sadece kendi bildirimlerini görmeye yetkisi varsa
-        elseif(\Yii::$app->user->can('notificationWebDefaultIndexOwn'))
-        {
-            //sisteme giriş yapan kullancının bildirimini notification değişkenine atadım
-            $notification= Notification::find()->where([ 'id_to'  => Yii::$app->user->id,'id_notification'=>$id_notification ])->one();
-
-            //eğer kendine ait bildirim varsa
-            if($notification)
-            {
-                //bildirimi görüntüle
-                return $this->render('view', [
-                    'model'=>$notification,
-                ]);
-            }
-
-        }
-
-        //bildirim görüntüleme yetkisi yoksa
-        else
-        {
+        if (!\Yii::$app->user->can('notificationWebDefaultView', ['model'=>$this->findModel($id_notification)])) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
+
+        $notification= Notification::find()->where([ 'id_to'  => Yii::$app->user->id,'id_notification'=>$id_notification ])->one();
+
+     return $this->render('view', [
+                'model'=>$notification,
+            ]);
     }
 
-    /**
-     * Creates a new Notification model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
-     */
     public function actionCreate()
     {
-        //mesaj oluşturmaya yetkin var mı yok mu kontrol ediyor.
         if (!\Yii::$app->user->can('notificationWebDefaultCreate')) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
@@ -122,26 +76,16 @@ class DefaultController extends Controller
         ]);
     }
 
-    /**
-     * Updates an existing Notification model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id_notification Id Notification
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-
-
     public function actionUpdate($id_notification)
     {
-        //update işlemi için yetkin var mı yok mu kontrol ediliyor yoksa exception fırlatılıyor
-        if (!\Yii::$app->user->can('notificationWebDefaultUpdate')) {
+        if (!\Yii::$app->user->can('notificationWebDefaultUpdate' , ['model'=>$this->findModel($id_notification)])) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
 
-        //hangi satırı güncelleyeceksen o satırı bul ve modele ata
         $model = $this->findModel($id_notification);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            Yii::$app->session->addFlash('success', Module::t('Notification has been updated'));
             return $this->redirect(['view', 'id_notification' => $model->id_notification]);
         }
 
@@ -150,53 +94,20 @@ class DefaultController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing Notification model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id_notification Id Notification
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionDelete($id_notification)
     {
-
-        //silme yetkin var mı kontrol ediliyor varsa istediğin kullanıcının bildirimini silebiilirsin
-        if(\Yii::$app->user->can('notificationWebDefaultDelete'))
+        if(!\Yii::$app->user->can('notificationWebDefaultDelete' , ['model'=>$this->findModel($id_notification)]))
         {
-            $this->findModel($id_notification)->delete();
-            return $this->redirect(['index']);
-        }
-        //sadece kendi bildirimini silebilsin
-        else if(\Yii::$app->user->can('notificationWebDefaultDeleteOwn'))
-        {
-            //sisteme giriş yapan kullancının bildirimlerini notifications değişkenine atadım
-            $notification= Notification::find()->where([ 'id_to'  => Yii::$app->user->id , 'id_notification'=>$id_notification])->one();
-
-            //eğer kendine ait bir bildirim varsa
-            if($notification)
-            {
-                $notification->delete();
-                return $this->redirect(['index']);
-            }
-        }
-       //kullanıcı hiçbir izne sahip değilse exception yollanıyor
-        else
-        {
-
-            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
-
+            throw new \yii\web\ForbiddenHttpException( Module::t('You are not allowed to access this page.'));
         }
 
+        if($this->findModel($id_notification)->delete()){
+            Yii::$app->session->addFlash('info', Module::t('Notification has been deleted'));
+        }
+        return $this->redirect(['index']);
 
     }
 
-    /**
-     * Finds the Notification model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id_notification Id Notification
-     * @return Notification the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($id_notification)
     {
         if (($model = Notification::findOne(['id_notification' => $id_notification])) !== null) {
