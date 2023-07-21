@@ -42,8 +42,8 @@ class Notification extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'id_to', 'text', 'title'], 'required'],
-            [['type', 'id_to'], 'integer'],
+            [['id_to', 'text', 'title'], 'required'],
+            [['id_to'], 'integer'],
             [['text', 'title'], 'string'],
         ];
     }
@@ -55,7 +55,6 @@ class Notification extends \yii\db\ActiveRecord
     {
         return [
             'id_notification' => 'Id Notification',
-            'type' => 'Type',
             'id_to' => 'Id To',
             'text' => 'Text',
             'title' => 'Title',

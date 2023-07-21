@@ -23,10 +23,10 @@ use portalium\notification\models\Notification;
         ]
     ],
 ]) ?>
-<?= $form->field($model, 'type')->textInput() ?>
 <?= $form->field($model, 'id_to')->dropDownList(Notification::getUserList())->label('User') ?>
-<?= $form->field($model, 'text')->textInput(['maxlength' => true]) ?>
 <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+<?= $form->field($model, 'text')->textInput(['maxlength' => true]) ?>
+
 
 <?php Panel::end() ?>
 <?php ActiveForm::end(); ?>

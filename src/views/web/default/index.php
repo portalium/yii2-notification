@@ -42,7 +42,6 @@ Panel::begin([
     'columns' => [
         ['class' => 'yii\grid\SerialColumn'],
 
-        'type',
         'user.username',
         'text',
         'title',

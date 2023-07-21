@@ -17,7 +17,7 @@ class NotificationSearch extends Notification
     public function rules()
     {
         return [
-            [['id_notification', 'type', 'id_to'], 'integer'],
+            [['id_notification', 'id_to'], 'integer'],
             [['text', 'title'], 'safe'],
         ];
     }
@@ -59,7 +59,6 @@ class NotificationSearch extends Notification
         // grid filtering conditions
         $query->andFilterWhere([
             'id_notification' => $this->id_notification,
-            'type' => $this->type,
             'id_to' => $this->id_to,
         ]);
 

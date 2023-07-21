@@ -17,8 +17,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id_notification') ?>
 
-    <?= $form->field($model, 'type') ?>
-
     <?= $form->field($model, 'id_to') ?>
 
     <?= $form->field($model, 'text') ?>

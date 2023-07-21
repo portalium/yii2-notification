@@ -37,7 +37,6 @@ $this->params['breadcrumbs'][] = $this->title;
     'model' => $model,
     'attributes' => [
         'id_notification',
-        'type',
         'id_to',
         'text',
         'title',
