@@ -46,6 +46,7 @@ There is a link for every notification which is displayed in the dropdown list o
 
 Also if you want to see the whole new notifications in one page, you can press the viewAll button that is located at the end of dropdown list which will
 redirect you to a page that you can see the whole notifications that sent to you. like the following,
+
 ![notification__](https://github.com/portalium/yii2-notification/assets/91452487/6af4c3aa-e0b6-4de9-9e79-00f5e4ccf800)
 
 But if you have permission to see all user's notification, then you will see all user's notification.
