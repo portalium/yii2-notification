@@ -1,18 +1,12 @@
 # Portalium-Notification
-
----
 This module created for sending and receiving notifications to specific users based on permissions
 that is given to related user.
 
 ## Requirements
   PHP 7.3.31 or higher
 
----
-
-
 ## How to use or develop
 
----
  You should add the following blocks of code into your composer.json file of your portalium module.
  
  to repositories part of your composer.json
