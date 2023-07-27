@@ -11,7 +11,7 @@ if (count($notifications) > 0)
 { ?>
 
 
-    <ul id="notification">
+    <ul class="card_box" id="notification">
         <li class="dropdown nav-item">
             <a href="#" class="dropdown-toggle" style="background-color: #212529" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-bell"><span class="position-absolute top-0 translate-middle badge rounded-pill bg-danger"><?=  count($notifications) ?>
@@ -24,7 +24,7 @@ if (count($notifications) > 0)
                 </div>
                 <hr class="dropdown-divider">
 
-                <div class="drop-content">
+                <div>
                     <div class="notifications-wrapper">
                         <div class="card" role="presentation">
                             <?php foreach ($notifications as $notification) { ?>
@@ -39,7 +39,9 @@ if (count($notifications) > 0)
                 </div>
 
                 <hr class="dropdown-divider">
-                <a class="notification-footer" href="/notification/default/index?"><h4 class="menu-title-footer">View all</h4></a>
+                <div class="notification-footer">
+                    <a class="a" href="/notification/default/index?"><h4 class="menu-title-footer">View all</h4></a>
+                </div>
             </ul>
 
         </li>
