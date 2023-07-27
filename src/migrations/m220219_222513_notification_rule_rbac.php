@@ -24,7 +24,9 @@ class m220219_222513_notification_rule_rbac extends Migration
         {
             $permission = $auth->createPermission($permissionName);
             $permission->description = $permissionName;
-            $permission->ruleName = $rule->name;
+            if($permissionName!=='notificationWebDefaultIndexOwn'){
+                $permission->ruleName = $rule->name;
+            }
             $auth->add($permission);
             $auth->addChild($admin, $permission);
             $childPermission = $auth->getPermission(str_replace('Own', '', $permissionName));
