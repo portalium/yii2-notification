@@ -1,13 +1,12 @@
 
-.navbar-default .dropdown-menu.notify-drop {
-    min-width: 330px;
+.dropdown-menu.notify-drop {
+    min-width: 240px;
     background-color: #fff;
-    min-height: 360px;
-    max-height: 360px;
 }
 
-.navbar-default .dropdown-menu.notify-drop .drop-content {
-    min-height: 280px;
+.dropdown-menu.notify-drop .drop-content {
+    min-width: 280px;
+    min-height: 200px;
     max-height: 280px;
     overflow-y: scroll;
 }
@@ -71,4 +70,16 @@
     display:inline-block;
     background-color: white;
     margin-left:-6px;
+}
+
+.a{
+    background: white;
+    color:black;
+    font:16px Poppins, sans-serif;
+    display:inline-block;
+    font-size:18px;
+}
+
+.card_box{
+    padding-top: 6px;
 }
