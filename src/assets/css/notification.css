@@ -1,6 +1,6 @@
 
 .dropdown-menu.notify-drop {
-    min-width: 240px;
+    min-width: 235px;
     background-color: #fff;
 }
 
@@ -11,10 +11,19 @@
     overflow-y: scroll;
 }
 
-.notification-heading, .notification-footer  {
+.notification-heading {
     padding:2px 10px;
     color: black;
     background-color: white;
+    margin-top: 1px;
+    margin-bottom: -16px;
+}
+.notification-footer  {
+    padding:2px 10px;
+    color: black;
+    background-color: white;
+    margin-top: 1px;
+    margin-bottom: -16px;
 }
 
 .menu-title {
@@ -70,6 +79,8 @@
     display:inline-block;
     background-color: white;
     margin-left:-6px;
+    margin-top: 1px;
+    margin-bottom: -16px;
 }
 
 .a{
@@ -78,6 +89,8 @@
     font:16px Poppins, sans-serif;
     display:inline-block;
     font-size:18px;
+    margin-bottom: -15px;
+    margin-top: -15px;
 }
 
 .card_box{
