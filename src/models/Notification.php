@@ -2,19 +2,11 @@
 
 namespace portalium\notification\models;
 
+use portalium\notification\models\Notification as notificationModel;
 use portalium\user\models\User;
 use Yii;
 use portalium\notification\Module;
 
-/**
- * This is the model class for table "notification_notification".
- *
- * @property int $id_notification
- * @property int $type
- * @property int $id_to
- * @property string $text
- * @property string $title
- */
 class Notification extends \yii\db\ActiveRecord
 {
     const TYPE = [
@@ -74,5 +66,13 @@ class Notification extends \yii\db\ActiveRecord
             $items[$user->id_user] = $user->first_name. " " .$user->last_name;
         }
         return $items;
+    }
+
+    public static function getRelatedNotifications(){
+        return NotificationModel::find()->where([ 'id_to'  => Yii::$app->user->id])->all();
+    }
+
+    public static function getAllNotifications(){
+        return notificationModel::find()->all();
     }
 }

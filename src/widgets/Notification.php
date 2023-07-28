@@ -2,12 +2,12 @@
 
 namespace portalium\notification\widgets;
 
-use mysql_xdevapi\Warning;
 use portalium\menu\models\MenuItem;
 use portalium\notification\models\Notification as notificationModel;
 use yii\base\Widget;
 use portalium\notification\Module;
 use Yii;
+use yii\helpers\Html;
 
 class Notification extends Widget
 {
@@ -18,7 +18,11 @@ class Notification extends Widget
     //initialize widget properties
     public function init()
     {
-        $this->display = MenuItem::TYPE_DISPLAY['icon'];
+        if(!$this->icon){
+            $this->icon = Html::tag('i', '', ['class' => '', 'style' => 'margin-right: 5px;']);
+        }
+//        $this->display = MenuItem::TYPE_DISPLAY['icon-text'];
+
         parent::init();
     }
 
@@ -36,9 +40,45 @@ class Notification extends Widget
         else{
             $notifications=[];
         }
+
+        if( isset($this->options['class']) )
+        {
+            $this->options['class'].=' dropdown-menu notify-drop';
+        }
+        else
+        {
+            $this->options['class']= 'dropdown-menu notify-drop';
+        }
         return $this->render('notifications', [
             'notifications' => $notifications,
-            'options' => $this->options
+            'options' => $this->options,
+            'label' => $this->generateLabel("Notification")
+
         ]);
+    }
+
+    private function generateLabel($text)
+    {
+        $label = "";
+        if(isset($this->display)){
+            switch ($this->display) {
+                case MenuItem::TYPE_DISPLAY['icon']:
+                    $label = $this->icon;
+                    break;
+                case MenuItem::TYPE_DISPLAY['icon-text']:
+                    $label = $this->icon . \portalium\site\Module::t($text);
+                    break;
+                case MenuItem::TYPE_DISPLAY['text']:
+                    $label = Module::t($text);
+                    break;
+                default:
+                    $label = $this->icon . Module::t($text);
+                    break;
+            }
+        }else{
+            $label = $this->icon . Module::t($text);
+
+        }
+        return $label;
     }
 }
