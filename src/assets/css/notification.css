@@ -1,13 +1,13 @@
 
 .dropdown-menu.notify-drop {
-    min-width: 235px;
+    min-width: 237px;
     background-color: #fff;
+    min-height:auto;
 }
 
-.dropdown-menu.notify-drop .drop-content {
-    min-width: 280px;
-    min-height: 200px;
-    max-height: 280px;
+.drop-content {
+    min-height: 52px;
+    max-height: 200px;
     overflow-y: scroll;
 }
 
@@ -89,10 +89,15 @@
     font:16px Poppins, sans-serif;
     display:inline-block;
     font-size:18px;
-    margin-bottom: -15px;
+    margin-bottom: -4px;
     margin-top: -15px;
+    margin-right:20px;
 }
 
 .card_box{
     padding-top: 6px;
+}
+
+.position-absolute.top-0.start-100.translate-middle.badge {
+    margin-left: -16px;
 }

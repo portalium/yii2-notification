@@ -6,6 +6,7 @@ use portalium\notification\models\Notification as notificationModel;
 use portalium\user\models\User;
 use Yii;
 use portalium\notification\Module;
+use yii\web\NotFoundHttpException;
 
 class Notification extends \yii\db\ActiveRecord
 {
@@ -69,10 +70,19 @@ class Notification extends \yii\db\ActiveRecord
     }
 
     public static function getRelatedNotifications(){
-        return NotificationModel::find()->where([ 'id_to'  => Yii::$app->user->id])->all();
+        return notificationModel::find()->where([ 'id_to'  => Yii::$app->user->id])->all();
     }
 
     public static function getAllNotifications(){
         return notificationModel::find()->all();
+    }
+
+    public static function findModel($id)
+    {
+        if (($model = Notification::findOne(['id_notification' => $id])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException(Module::t('The requested page does not exist.'));
     }
 }

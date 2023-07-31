@@ -13,12 +13,13 @@ if (count($notifications) > 0)
      echo Html::beginTag('ul', ['class' => 'card_box', 'id' => 'notification']);
         echo Html::beginTag('li',['class' => 'dropdown nav-item']);
 
-                 //icon
+            //icon
             echo Html::beginTag('a', ['class' => 'dropdown-toggle','style' => 'background-color:#212529', 'data-bs-toggle'=>'dropdown', 'role'=>'button', 'aria-haspopup'=>'true', 'aria-expanded'=>'false', 'href'=>'#'])
-                    .'<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    .'<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger marginleft--10px">
                     '.count($notifications).'
                     <span class="visually-hidden">unread messages</span>
-                    </span>'.
+                    </span>'.$label.
+
                  Html::endTag("a");
 
                 echo Html::beginTag('ul', $options);
@@ -31,23 +32,26 @@ if (count($notifications) > 0)
                     //divider
                     echo Html::tag('hr',['class'=>'dropdown-divider']);
 
-                    //body of dropdown list
-                    echo Html::beginTag('div');
-                        echo Html::beginTag('div',['class'=>'notification-wrapper']);
-                            echo Html::beginTag('div',['class'=>'card', 'role'=>'presentation']);
-?>
-                                <?php foreach ($notifications as $notification) { ?>
-                                    <a class="card" role="presentation" href="/notification/default/view?id_notification=<?= $notification->id_notification?>">
-                                    <h4 class="item-title"><?php echo $notification -> title ?></h4>
-                                    <p class="item-info"><?php if (strlen($notification->text) > 19) { echo substr($notification -> text, 0, 22).'...';}
-                                    else echo($notification->text) ?></p>
-                                    </a>
-                                <?php } ?>
-<?php
+                    echo Html::beginTag('div',['class'=>'drop-content']);
+
+                        //body of dropdown list
+                        echo Html::beginTag('div');
+                            echo Html::beginTag('div',['class'=>'notification-wrapper']);
+                                echo Html::beginTag('div',['class'=>'card', 'role'=>'presentation']);
+    ?>
+                                    <?php foreach ($notifications as $notification) { ?>
+                                        <a class="card" role="presentation" href="/notification/default/view?id=<?= $notification->id_notification?>">
+                                        <h4 class="item-title"><?php echo $notification -> title ?></h4>
+                                        <p class="item-info"><?php if (strlen($notification->text) > 19) { echo substr($notification -> text, 0, 22).'...';}
+                                        else echo($notification->text) ?></p>
+                                        </a>
+                                    <?php } ?>
+    <?php
+                                echo Html::endTag('div');
                             echo Html::endTag('div');
                         echo Html::endTag('div');
-                    echo Html::endTag('div');
 
+                    echo Html::endTag('div');
                     //divider
                     echo Html::tag('hr',['class'=>'dropdown-divider']);
 
