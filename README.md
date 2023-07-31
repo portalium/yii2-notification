@@ -1,4 +1,15 @@
 # <p align="center">Portalium-Notification</p>
+
+# Table of Contents
++ [Introduction](#introduction)
++ [Requirements](#requirements)
++ [How does the Notification Module work?](#how-does-the-notification-module-work)
+    + [Read](#read)
+    + [Create](#create)
+    + [Update](#update)
+    + [Delete](#delete)
++ [How to use or develop](#how-to-use-or-develop)
+## Introduction
 This module created for sending and receiving notifications to specific users based on permissions
 that is given to related user.
 
@@ -6,36 +17,46 @@ that is given to related user.
   PHP 7.3.31 or higher
 
 
-
-
 ## How does the Notification Module work?
 Creating, Updating, Deleting and  Viewing the notification is done base on the permissions that is given to users.<br>
-In notification model there is id_to attribute which specifies to whom the notification is going to be sent.
-If a user have any new notification, the number of notifications is displayed beside the bell icon in the menu bar of home page.
+### Read
+For reading or viewing your notifications you need to check the bell icon on the right corner of your login page.
+If you have any new notification, a number which states the number of notifications will be appeared on top of bell icon.
 <br>
 
-![notification-widget](https://github.com/portalium/yii2-notification/assets/91452487/df3b87cd-a801-410c-ad27-30b4fc236c2c)
+![bell_icon.png](..%2F..%2F..%2F..%2F..%2F..%2Fbell_icon.png)
+<br>
+By clicking any of them you will be redirected to that notification.
+
+
+![notification_dropdown.png](..%2F..%2F..%2F..%2F..%2F..%2Fnotification_dropdown.png)
 <br>
 
-There is a link for every notification which is displayed in the dropdown list of bell icon, and you can go to that link and see the whole content of related notification. 
+### Create
+For creating a notification you should have the related permission. If you have the permission you can start to create a notification
+by clicking on the viewAll in the dropdown list of bell icon and then click on the plus(+) icon that is located on the corner side of your page.
+The first field shows to whom the notification will be sent. After filling required fields, you can click on the save button.
+
+![create.png](..%2F..%2F..%2F..%2F..%2F..%2Fcreate.png)
+
+
+### Update
+For updating a notification you need to click on the pencil icon on the right side your notification as follows,
+
+![update_pen_icon.png](..%2F..%2F..%2F..%2F..%2F..%2Fupdate_pen_icon.png)
+
+
+### Delete
+For deleting a notification, you should click on the trash icon which is located on the right side of your related notification row.
 <br>
 
-
-Also, if you want to see the whole new notifications in one page, you can press the viewAll button that is located at the end of dropdown list which will
-redirect you to a page that you can see the whole notifications that sent only to you. like the following,
-
-![notification__](https://github.com/portalium/yii2-notification/assets/91452487/6af4c3aa-e0b6-4de9-9e79-00f5e4ccf800)
-
-But if you have permission to see all user's notification, then you will see all user's notification.
+![delete_trash.png](..%2F..%2F..%2F..%2F..%2F..%2Fdelete_trash.png)
 <br>
-
-As mentioned before for deleting and updating notification there are specific permissions and if you have that permission, then
-you will be allowed to update or delete notification.
 
 
 ## How to use or develop
 
-You should add the following blocks of code into your composer.json file of your portalium module.
+You should add the following blocks of code into your composer.json file of your Portalium module.
 
 to repositories part of your composer.json
 <br>
