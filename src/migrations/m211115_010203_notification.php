@@ -1,6 +1,5 @@
 <?php
 
-use yii\db\Schema;
 use yii\db\Migration;
 use portalium\user\Module as UserModule;
 use portalium\notification\Module;
@@ -16,7 +15,6 @@ class m211115_010203_notification extends Migration
             Module::$tablePrefix . "notification",
             [
                 'id_notification'=> $this->primaryKey(),
-                'type'=> $this->integer()->notNull(),
                 'id_to'=> $this->integer()->notNull(),
                 'text'=> $this->string()->notNull(),
                 'title'=> $this->string()->notNull(),
