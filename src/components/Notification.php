@@ -8,7 +8,7 @@ use portalium\user\models\User;
 class Notification extends Component
 {
 
-    public function addNotification($type,$id_to,$text,$title)
+    public function addNotification($id_to,$text,$title)
     { 
         $model = new Notification();
         $model->load();

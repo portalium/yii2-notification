@@ -2,51 +2,83 @@
 
 namespace portalium\notification\widgets;
 
-
-use portalium\theme\widgets\Nav;
+use portalium\menu\models\MenuItem;
 use portalium\notification\models\Notification as notificationModel;
 use yii\base\Widget;
 use portalium\notification\Module;
+use Yii;
+use yii\helpers\Html;
+
 class Notification extends Widget
 {
     public $options;
     public $display;
+    public $icon;
 
     //initialize widget properties
     public function init()
     {
+        if(!$this->icon){
+            $this->icon = Html::tag('i', '', ['class' => '', 'style' => 'margin-right: 5px;']);
+        }
+//        $this->display = MenuItem::TYPE_DISPLAY['icon-text'];
+
         parent::init();
     }
 
     //contain the code that generates the rendering result of the widget
     public function run()
     {
-        $notificationItems = [];
-        $notifications = notificationModel::find()->all();
-        foreach ($notifications as $value){
-            $notificationItems[] = [
-                'label' => Module::t($value->title),
-                'url' => ['/notification/default/index'],
-            ];
+        if(\Yii::$app->user->can('notificationWebDefaultIndex'))
+        {
+            $notifications = notificationModel::getAllNotifications();
+        }
+        else if(\Yii::$app->user->can('notificationWebDefaultIndexOwn'))
+        {
+            $notifications = notificationModel::getRelatedNotifications();
+        }
+        else{
+            $notifications=[];
         }
 
-        $menuItems[] = [
-            'label' => "Notifications",
-            'items' => $notificationItems,
-            'display' => $this->display,
-        ];
+        if( isset($this->options['class']) )
+        {
+            $this->options['class'].=' dropdown-menu notify-drop';
+        }
+        else
+        {
+            $this->options['class']= 'dropdown-menu notify-drop';
+        }
+        return $this->render('notifications', [
+            'notifications' => $notifications,
+            'options' => $this->options,
+            'label' => $this->generateLabel("Notification")
 
+        ]);
+    }
 
-        return $this->render('
-        notification_list'
-            //, [
-//            'options' => $this->options,
-//            'items' => $menuItems,
-//        ]
-);
-//        return Nav::widget([
-//            'options' => $this->options,
-//            'items' => $menuItems,
-//        ]);
+    private function generateLabel($text)
+    {
+        $label = "";
+        if(isset($this->display)){
+            switch ($this->display) {
+                case MenuItem::TYPE_DISPLAY['icon']:
+                    $label = $this->icon;
+                    break;
+                case MenuItem::TYPE_DISPLAY['icon-text']:
+                    $label = $this->icon . \portalium\site\Module::t($text);
+                    break;
+                case MenuItem::TYPE_DISPLAY['text']:
+                    $label = Module::t($text);
+                    break;
+                default:
+                    $label = $this->icon . Module::t($text);
+                    break;
+            }
+        }else{
+            $label = $this->icon . Module::t($text);
+
+        }
+        return $label;
     }
 }
