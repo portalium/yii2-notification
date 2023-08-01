@@ -11,7 +11,7 @@
 + [How to use or develop](#how-to-use-or-develop)
 + [General Usage](#general-usage)
     + [Widgets](docs/widgets/widget.md)
-    + [Component](#component)
+    + [Component](docs/components/components.md)
   
 ## Introduction
 This module created for sending and receiving notifications to specific users based on permissions
@@ -31,6 +31,7 @@ If you have any new notification, a number which states the number of notificati
 ![bell_icon](https://github.com/portalium/yii2-notification/assets/91452487/d76e7abd-0414-4e63-9007-0a8231eb296f)
 
 <br>
+
 By clicking any of them you will be redirected to that notification.
 
 ![notification_dropdown](https://github.com/portalium/yii2-notification/assets/91452487/260a7baf-82b0-426c-a2f6-ac9e772612e7)
