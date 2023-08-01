@@ -11,7 +11,7 @@
 + [How to use or develop](#how-to-use-or-develop)
 + [General Usage](#general-usage)
     + [Widgets](docs/widgets/widget.md)
-    + [Component](#component)
+    + [Component](docs/components/components.md)
   
 ## Introduction
 This module created for sending and receiving notifications to specific users based on permissions
