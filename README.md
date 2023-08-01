@@ -54,7 +54,9 @@ For updating a notification you need to click on the pencil icon on the right si
 ### Delete
 For deleting a notification, you should click on the trash icon which is located on the right side of your related notification row.
 <br>
+
 ![delete_trash](https://github.com/portalium/yii2-notification/assets/91452487/69b02e06-0f47-4bc0-9455-7a7b9f72632d)
+
 <br>
 
 
