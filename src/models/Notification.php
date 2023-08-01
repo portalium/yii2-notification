@@ -21,17 +21,11 @@ class Notification extends \yii\db\ActiveRecord
             '2' => Module::t('Group')
         ];
     }
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return '{{' . Module::$tablePrefix . 'notification}}';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -40,10 +34,6 @@ class Notification extends \yii\db\ActiveRecord
             [['text', 'title'], 'string'],
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [

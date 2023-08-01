@@ -9,6 +9,10 @@
     + [Update](#update)
     + [Delete](#delete)
 + [How to use or develop](#how-to-use-or-develop)
++ [General Usage](#general-usage)
+    + [Widgets](docs/widgets/widget.md)
+    + [Component](#component)
+  
 ## Introduction
 This module created for sending and receiving notifications to specific users based on permissions
 that is given to related user.
@@ -78,3 +82,4 @@ and in web\config\main.php path you should add the following block of code in mo
 }`
 <br><br>
 and finally, you should run `composer update` command in the terminal of your php container in Docker.
+<br>
