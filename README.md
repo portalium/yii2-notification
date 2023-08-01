@@ -28,12 +28,14 @@ For reading or viewing your notifications you need to check the bell icon on the
 If you have any new notification, a number which states the number of notifications will be appeared on top of bell icon.
 <br>
 
-![bell_icon.png](..%2F..%2F..%2F..%2F..%2F..%2Fbell_icon.png)
+![bell_icon](https://github.com/portalium/yii2-notification/assets/91452487/d76e7abd-0414-4e63-9007-0a8231eb296f)
+
 <br>
+
 By clicking any of them you will be redirected to that notification.
 
+![notification_dropdown](https://github.com/portalium/yii2-notification/assets/91452487/260a7baf-82b0-426c-a2f6-ac9e772612e7)
 
-![notification_dropdown.png](..%2F..%2F..%2F..%2F..%2F..%2Fnotification_dropdown.png)
 <br>
 
 ### Create
@@ -41,20 +43,20 @@ For creating a notification you should have the related permission. If you have 
 by clicking on the viewAll in the dropdown list of bell icon and then click on the plus(+) icon that is located on the corner side of your page.
 The first field shows to whom the notification will be sent. After filling required fields, you can click on the save button.
 
-![create.png](..%2F..%2F..%2F..%2F..%2F..%2Fcreate.png)
-
+![create](https://github.com/portalium/yii2-notification/assets/91452487/94d1fa18-b50e-4364-ba65-46ec61ea7ed3)
 
 ### Update
 For updating a notification you need to click on the pencil icon on the right side your notification as follows,
 
-![update_pen_icon.png](..%2F..%2F..%2F..%2F..%2F..%2Fupdate_pen_icon.png)
+![update_pen_icon](https://github.com/portalium/yii2-notification/assets/91452487/ff8a1276-10d0-4a6c-a7e5-9a152fd5c1e9)
 
 
 ### Delete
 For deleting a notification, you should click on the trash icon which is located on the right side of your related notification row.
 <br>
 
-![delete_trash.png](..%2F..%2F..%2F..%2F..%2F..%2Fdelete_trash.png)
+![delete_trash](https://github.com/portalium/yii2-notification/assets/91452487/69b02e06-0f47-4bc0-9455-7a7b9f72632d)
+
 <br>
 
 
