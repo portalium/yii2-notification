@@ -2,12 +2,12 @@
 
 use portalium\notification\models\Notification;
 use portalium\notification\Module;
+use portalium\theme\widgets\ActionColumn;
 use portalium\theme\widgets\ActiveForm;
+use portalium\theme\widgets\GridView;
 use portalium\theme\widgets\Panel;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\grid\ActionColumn;
-use yii\grid\GridView;
 
 /** @var yii\web\View $this */
 /** @var portalium\notification\models\NotificationSearch $searchModel */
@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <?php
 
-$form = ActiveForm::begin();
+
 Panel::begin([
     'title' => Module::t('Notification'),
     'actions' => [
@@ -43,8 +43,22 @@ Panel::begin([
         ['class' => 'yii\grid\SerialColumn'],
 
         'user.username',
-        'text',
+        [
+            'attribute' => 'text',
+            'format' => 'raw',
+            'value' => function ($model) {
+                return $model->text;
+            }
+        ],
         'title',
+        [
+            'attribute' => 'status',
+            'value' => function ($model) {
+                return Notification::getStatusList()[$model->status];
+            },
+            'filter' => Notification::getStatusList()
+
+        ],
         [
             'class' => ActionColumn::class,
             'template' => '{view} {update} {assignment} {delete}',
@@ -58,5 +72,4 @@ Panel::begin([
     ],
 ]); ?>
 <?php Panel::end();
-ActiveForm::end();
 ?>

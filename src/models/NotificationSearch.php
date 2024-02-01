@@ -4,14 +4,13 @@ namespace portalium\notification\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use portalium\notification\models\Notification;
 
 class NotificationSearch extends Notification
 {
     public function rules()
     {
         return [
-            [['id_notification', 'id_to'], 'integer'],
+            [['id_notification', 'id_to', 'status'], 'integer'],
             [['text', 'title'], 'safe'],
         ];
     }
@@ -44,6 +43,7 @@ class NotificationSearch extends Notification
         $query->andFilterWhere([
             'id_notification' => $this->id_notification,
             'id_to' => $this->id_to,
+            'status' => $this->status,
         ]);
 
         $query->andFilterWhere(['like', 'text', $this->text])
