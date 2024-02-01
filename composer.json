@@ -1,5 +1,5 @@
 {
-	"name" : "portalium/yii2-notification",
+	"name" : "portalium/yii2-notification", 
 	"description" : "Module notification for Portalium",
 	"type" : "portalium-core",
 	"license": "MIT",
