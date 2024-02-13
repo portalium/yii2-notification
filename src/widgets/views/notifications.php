@@ -1,77 +1,92 @@
 <?php
+
 use portalium\notification\bundles\NotificationAsset;
 use portalium\notification\Module;
 use yii\helpers\Html;
+
 $this->title = Module::t('Notification');
 NotificationAsset::register($this);
 ?>
 
 <?php
-if (count($notifications) > 0)
-{ ?>
-    <?php
-     echo Html::beginTag('ul', ['class' => 'card_box', 'id' => 'notification']);
-        echo Html::beginTag('li',['class' => 'dropdown nav-item']);
+if (count($notifications) > 0) { ?>
 
-            //icon
-            echo Html::beginTag('a', ['class' => 'dropdown-toggle','style' => 'background-color:#212529', 'data-bs-toggle'=>'dropdown', 'role'=>'button', 'aria-haspopup'=>'true', 'aria-expanded'=>'false', 'href'=>'#'])
-                    .'<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger marginleft--10px">
-                    '.count($notifications).'
+    <ul class="card-box nav" id="notification">
+        <li class="dropdown nav-item">
+            <a class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="#" style="padding-left: 0px !important; padding-right: 0px !important;">
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger marginleft--10px">
+                    <?= count($notifications) ?>
                     <span class="visually-hidden">unread messages</span>
-                    </span>'.$label.
-
-                 Html::endTag("a");
-
-                echo Html::beginTag('ul', $options);
-                    //header
-                    echo Html::beginTag('div',['class'=>'notification-heading']);
-                        echo Html::beginTag('h4',['class'=>'menu-title']).'Notifications'.
-                             Html::endTag('h4');
-                    echo Html::endTag('div');
-
-                    //divider
-                    echo Html::tag('hr',['class'=>'dropdown-divider']);
-
-                    echo Html::beginTag('div',['class'=>'drop-content']);
-
-                        //body of dropdown list
-                        echo Html::beginTag('div');
-                            echo Html::beginTag('div',['class'=>'notification-wrapper']);
-                                echo Html::beginTag('div',['class'=>'card', 'role'=>'presentation']);
-    ?>
-                                    <?php foreach ($notifications as $notification) { ?>
-                                        <a class="card" role="presentation" href="/notification/default/view?id=<?= $notification->id_notification?>">
-                                        <h4 class="item-title"><?php echo $notification -> title ?></h4>
-                                        <p class="item-info"><?php if (strlen($notification->text) > 19) { echo substr($notification -> text, 0, 22).'...';}
-                                        else echo($notification->text) ?></p>
-                                        </a>
-                                    <?php } ?>
-    <?php
-                                echo Html::endTag('div');
-                            echo Html::endTag('div');
-                        echo Html::endTag('div');
-
-                    echo Html::endTag('div');
-                    //divider
-                    echo Html::tag('hr',['class'=>'dropdown-divider']);
-
-                    //footer
-                    echo Html::beginTag('div',['notification-footer']);
-                        echo Html::beginTag('a',['class'=>'a','href'=>'/notification/default/index?']);
-                            echo Html::beginTag('h4',['class'=>'menu-title-footer']).'View all'.
-                                 Html::endTag('h4');
-                        echo Html::endTag('a');
-                    echo Html::endTag('div');
-
+                </span>
+                <i class="fa fa-bell" style="padding-left: 20px; padding-right: 20px; margin-top: 3px; color: black !important;"></i>
+            </a>
+            <?php
+            echo Html::beginTag('ul', $options);
+            ?>
+            <div class="notification-heading">
+                <span class="menu-title">Notifications</span>
+            </div>
+            <div class="drop-content">
+                <div class="card" role="presentation">
+                    <?php foreach ($notifications as $notification) { ?>
+                        <div class="d-flex flex-row justify-content-between card-notification-item" data-key="<?= $notification->id_notification ?>">
+                            <p class="card notification-content" role="presentation"  style="padding: 8px 0px 8px 17px !important; background: transparent">
+                                <span class="item-title"><?php echo $notification->title ?></span>
+                            </p>
+                            <div class="notification-action">
+                                <a href="/notification/default/view?id=<?= $notification->id_notification ?>" class="btn btn-success btn-sm" style="padding: 5px !important;"><span class="fa fa-search"></span></a>
+                                <span class="btn btn-danger btn-sm" style="padding: 5px !important;" onclick="readNotification(<?= $notification->id_notification ?>)"><span class="fa fa-trash"></span></span>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="notification-footer">
+                <a href="/notification/default/index?" style="padding-left: 10px !important; width: 100%; display: flex; float: none; text-align: center; align-items: center;">
+                    <span class="menu-title-footer">View all</span>
+                </a>
+            </div>
+            <?php
             echo Html::endTag('ul');
-        echo Html::endTag('li');
-    echo Html::endTag('ul');
-?>
+            ?>
+        </li>
+    </ul>
 <?php
 
+} else {
+    echo Html::tag('i', '', ['class' => 'fa fa-bell-slash', 'style' => 'padding-left: 20px; padding-right: 20px; margin-top: 10px;']);
 }
-else
-{
-    echo Html::tag('i', '', ['class' => 'fa fa-bell-slash', 'style' => 'margin-right: 22px; color: white; margin-top: 10px;']);
-}
+?>
+
+<?php
+$js = <<<JS
+    function readNotification(id) {
+        $.ajax({
+            url: '/notification/default/read?id=' + id,
+            type: 'GET',
+            success: function (data) {
+                console.log(data);
+                if (data.success) {
+                    let notification = $('#notification');
+                    let notificationItem = notification.find('[data-key=' + id + ']');
+                    notificationItem.remove();
+                    let notificationCount = notification.find('.badge');
+                    let count = parseInt(notificationCount.text());
+                    notificationCount.text(count - 1);
+                    if (count - 1 === 0) {
+                        notificationCount.remove();
+                        $('#notification').html('<i class="fa fa-bell-slash" style="padding-left: 20px; padding-right: 20px; margin-top: 10px;"></i>');
+                    }
+                }
+            }
+        });
+    }
+    $(document).ready(function () {
+        $('#notification ul').on('click', function (e) {
+            console.log('click');
+            e.stopPropagation();
+        });
+    });
+JS;
+$this->registerJs($js, \yii\web\View::POS_BEGIN);
 ?>

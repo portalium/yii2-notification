@@ -3,7 +3,7 @@
 namespace portalium\notification\widgets;
 
 use portalium\menu\models\MenuItem;
-use portalium\notification\models\Notification as notificationModel;
+use portalium\notification\models\Notification as NotificationModel;
 use yii\base\Widget;
 use portalium\notification\Module;
 use Yii;
@@ -18,10 +18,10 @@ class Notification extends Widget
     //initialize widget properties
     public function init()
     {
-        if(!$this->icon){
+        if (!$this->icon) {
             $this->icon = Html::tag('i', '', ['class' => '', 'style' => 'margin-right: 5px;']);
         }
-//        $this->display = MenuItem::TYPE_DISPLAY['icon-text'];
+        //        $this->display = MenuItem::TYPE_DISPLAY['icon-text'];
 
         parent::init();
     }
@@ -29,25 +29,22 @@ class Notification extends Widget
     //contain the code that generates the rendering result of the widget
     public function run()
     {
-        if(\Yii::$app->user->can('notificationWebDefaultIndex'))
-        {
-            $notifications = notificationModel::getAllNotifications();
-        }
-        else if(\Yii::$app->user->can('notificationWebDefaultIndexOwn'))
-        {
-            $notifications = notificationModel::getRelatedNotifications();
-        }
-        else{
-            $notifications=[];
+        // if(\Yii::$app->user->can('notificationWebDefaultIndex'))
+        // {
+        // $notifications = NotificationModel::getAllNotifications();
+        // }
+        if (\Yii::$app->user->can('notificationWebDefaultIndexOwn'))
+            // {
+            $notifications = NotificationModel::getUnreadNotifications();
+        // }
+        else {
+            $notifications = [];
         }
 
-        if( isset($this->options['class']) )
-        {
-            $this->options['class'].=' dropdown-menu notify-drop';
-        }
-        else
-        {
-            $this->options['class']= 'dropdown-menu notify-drop';
+        if (isset($this->options['class'])) {
+            $this->options['class'] .= ' dropdown-menu notify-drop';
+        } else {
+            $this->options['class'] = 'dropdown-menu notify-drop';
         }
         return $this->render('notifications', [
             'notifications' => $notifications,
@@ -60,7 +57,7 @@ class Notification extends Widget
     private function generateLabel($text)
     {
         $label = "";
-        if(isset($this->display)){
+        if (isset($this->display)) {
             switch ($this->display) {
                 case MenuItem::TYPE_DISPLAY['icon']:
                     $label = $this->icon;
@@ -75,9 +72,8 @@ class Notification extends Widget
                     $label = $this->icon . Module::t($text);
                     break;
             }
-        }else{
+        } else {
             $label = $this->icon . Module::t($text);
-
         }
         return $label;
     }

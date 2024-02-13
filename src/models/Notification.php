@@ -2,7 +2,6 @@
 
 namespace portalium\notification\models;
 
-use portalium\notification\models\Notification as notificationModel;
 use portalium\user\models\User;
 use Yii;
 use portalium\notification\Module;
@@ -10,17 +9,9 @@ use yii\web\NotFoundHttpException;
 
 class Notification extends \yii\db\ActiveRecord
 {
-    const TYPE = [
-        'user' => '1',
-        'group' => '2'
-    ];
-    public static function getTypes()
-    {
-        return [
-            '1' => Module::t('User'),
-            '2' => Module::t('Group')
-        ];
-    }
+    const STATUS_UNREAD = 0;
+    const STATUS_READ = 1;
+
     public static function tableName()
     {
         return '{{' . Module::$tablePrefix . 'notification}}';
@@ -30,8 +21,9 @@ class Notification extends \yii\db\ActiveRecord
     {
         return [
             [['id_to', 'text', 'title'], 'required'],
-            [['id_to'], 'integer'],
+            [['id_to', 'status'], 'integer'],
             [['text', 'title'], 'string'],
+            [['id_to'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['id_to' => 'id_user']],
         ];
     }
     public function attributeLabels()
@@ -41,6 +33,7 @@ class Notification extends \yii\db\ActiveRecord
             'id_to' => 'Id To',
             'text' => 'Text',
             'title' => 'Title',
+            'status' => 'Status',
         ];
     }
 
@@ -60,11 +53,27 @@ class Notification extends \yii\db\ActiveRecord
     }
 
     public static function getRelatedNotifications(){
-        return notificationModel::find()->where([ 'id_to'  => Yii::$app->user->id])->all();
+        return self::find()->where([ 'id_to'  => Yii::$app->user->id])->all();
     }
 
     public static function getAllNotifications(){
-        return notificationModel::find()->all();
+        return self::find()->all();
+    }
+
+    public static function getUnreadNotifications(){
+        return self::find()->where([ 'id_to'  => Yii::$app->user->id, 'status' => self::STATUS_UNREAD])->all();
+    }
+
+    public static function getReadNotifications(){
+        return self::find()->where([ 'id_to'  => Yii::$app->user->id, 'status' => self::STATUS_READ])->all();
+    }
+
+    public static function getStatusList()
+    {
+        return [
+            self::STATUS_UNREAD => Module::t('Unread'),
+            self::STATUS_READ => Module::t('Read'),
+        ];
     }
 
     public static function findModel($id)

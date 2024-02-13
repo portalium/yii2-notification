@@ -18,7 +18,7 @@ class m211115_010203_notification extends Migration
                 'id_to'=> $this->integer()->notNull(),
                 'text'=> $this->string()->notNull(),
                 'title'=> $this->string()->notNull(),
-
+                'status'=> $this->integer()->notNull()->defaultValue(0),
             ],
             $tableOptions
         );

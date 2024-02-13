@@ -3,7 +3,6 @@
 namespace portalium\notification\controllers\web;
 
 use portalium\notification\models\Notification;
-use portalium\notification\models\Notification as notificationModel;
 use portalium\notification\models\NotificationSearch;
 use portalium\web\Controller;
 use portalium\notification\Module;
@@ -31,10 +30,11 @@ class DefaultController extends Controller
         if (!\Yii::$app->user->can('notificationWebDefaultIndex') && !\Yii::$app->user->can('notificationWebDefaultIndexOwn')) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
-        $searchModel = new NotificationSearch;
+        $searchModel = new NotificationSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
-        if(!\Yii::$app->user->can('notificationWebDefaultIndex'))
-            $dataProvider->query->andWhere(['id_to'=>\Yii::$app->user->id]);
+        
+        if (!\Yii::$app->user->can('notificationWebDefaultIndex'))
+            $dataProvider->query->andWhere(['id_to' => \Yii::$app->user->id]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -42,15 +42,36 @@ class DefaultController extends Controller
         ]);
     }
 
+    public function actionRead($id)
+    {
+        // if (!\Yii::$app->user->can('notificationWebDefaultDelete', ['model' => Notification::findModel($id)])) {
+            // throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        // }
+
+        if ($model = Notification::findModel($id)) {
+            $model->status = Notification::STATUS_READ;
+            $model->save();
+            // Yii::$app->session->addFlash('info', Module::t('Notification has been deleted'));
+        }
+        if (Yii::$app->request->isAjax) {
+            return $this->asJson(['success' => true]);
+        }
+        return $this->redirect(['index']);
+    }
+
     public function actionView($id)
     {
-        if (!\Yii::$app->user->can('notificationWebDefaultView' ,['model'=>notificationModel::findModel($id)])) {
+        $notification = Notification::findModel($id);
+        if (!\Yii::$app->user->can('notificationWebDefaultView', ['model' => Notification::findModel($id)])) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
-
+        if ($notification->status == Notification::STATUS_UNREAD) {
+            $notification->status = Notification::STATUS_READ;
+            $notification->save();
+        }
         return $this->render('view', [
-                'model'=> notificationModel::findModel($id),
-            ]);
+            'model' => $notification,
+        ]);
     }
 
     public function actionCreate()
@@ -76,11 +97,11 @@ class DefaultController extends Controller
 
     public function actionUpdate($id)
     {
-        if (!\Yii::$app->user->can('notificationWebDefaultUpdate' , ['model'=> notificationModel::findModel($id)])) {
+        if (!\Yii::$app->user->can('notificationWebDefaultUpdate', ['model' => Notification::findModel($id)])) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
 
-        $model = notificationModel::findModel($id);
+        $model = Notification::findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             Yii::$app->session->addFlash('success', Module::t('Notification has been updated'));
@@ -94,12 +115,11 @@ class DefaultController extends Controller
 
     public function actionDelete($id)
     {
-        if(!\Yii::$app->user->can('notificationWebDefaultDelete' , ['model'=>notificationModel::findModel($id)]))
-        {
-            throw new \yii\web\ForbiddenHttpException( Module::t('You are not allowed to access this page.'));
+        if (!\Yii::$app->user->can('notificationWebDefaultDelete', ['model' => Notification::findModel($id)])) {
+            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
 
-        if(notificationModel::findModel($id)->delete()){
+        if (Notification::findModel($id)->delete()) {
             Yii::$app->session->addFlash('info', Module::t('Notification has been deleted'));
         }
         return $this->redirect(['index']);
