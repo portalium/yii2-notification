@@ -4,7 +4,6 @@ use portalium\notification\bundles\NotificationAsset;
 use portalium\notification\Module;
 use yii\helpers\Html;
 
-$this->title = Module::t('Notification');
 NotificationAsset::register($this);
 ?>
 
@@ -54,7 +53,9 @@ if (count($notifications) > 0) { ?>
 <?php
 
 } else {
-    echo Html::tag('i', '', ['class' => 'fa fa-bell-slash', 'style' => 'padding-left: 20px; padding-right: 20px; margin-top: 10px;']);
+    echo Html::beginTag('ul', ['class' => 'nav nav-link']);
+    echo Html::tag('i', '', ['class' => 'fa fa-bell-slash remove-after', 'style' => 'padding-left: 2px;']);
+    echo Html::endTag('ul');
 }
 ?>
 
