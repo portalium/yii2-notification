@@ -66,7 +66,6 @@ $js = <<<JS
             url: '/notification/default/read?id=' + id,
             type: 'GET',
             success: function (data) {
-                console.log(data);
                 if (data.success) {
                     let notification = $('#notification');
                     let notificationItem = notification.find('[data-key=' + id + ']');
@@ -84,7 +83,6 @@ $js = <<<JS
     }
     $(document).ready(function () {
         $('#notification ul').on('click', function (e) {
-            console.log('click');
             e.stopPropagation();
         });
     });
