@@ -8,6 +8,7 @@ use yii\base\Widget;
 use portalium\notification\Module;
 use Yii;
 use yii\helpers\Html;
+use yii\widgets\Pjax;
 
 class Notification extends Widget
 {
@@ -19,7 +20,7 @@ class Notification extends Widget
     public function init()
     {
         if (!$this->icon) {
-            $this->icon = Html::tag('i', '', ['class' => '', 'style' => 'margin-right: 5px;']);
+            $this->icon = Html::tag('i', '', ['class' => 'fa fa-bell', 'style' => 'margin-right: 5px;']);
         }
         //        $this->display = MenuItem::TYPE_DISPLAY['icon-text'];
 
