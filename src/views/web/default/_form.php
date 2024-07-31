@@ -26,7 +26,7 @@ use portalium\notification\models\Notification;
 <?= $form->field($model, 'id_to')->dropDownList(Notification::getUserList())->label('User') ?>
 <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 <?= $form->field($model, 'text')->textInput(['maxlength' => true]) ?>
-
+<?php echo 'eşosş'; ?>
 
 <?php Panel::end() ?>
 <?php ActiveForm::end(); ?>
