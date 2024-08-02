@@ -14,13 +14,8 @@ class m240731_153143_notification_menu extends Migration
      */
     public function safeUp()
     {
-        // Ana menüyü bulma
-        //$id_menu = Menu::find()->where(['slug' => 'web-main-menu'])->one()->id_menu;
-
-        // Bildirim menü öğesini kontrol etme
         $id_item = MenuItem::find()->where(['slug' => 'notification'])->one();
 
-        // Menü öğesi yoksa ekleme
         if(!$id_item){
             $this->insert('menu_item', [
                 'id_item' => NULL,
@@ -37,13 +32,9 @@ class m240731_153143_notification_menu extends Migration
                 'date_update' => '2024-05-07 16:30:22',
             ]);
         } else {
-            // Mevcut menü öğesinin id'sini al
             $id_item = $id_item->id_item;
         }
-        // Bildirim menü öğesinin id'sini tekrar kontrol et
         $id_item = MenuItem::find()->where(['slug' => 'notification'])->one()->id_item;
-
-
     }
 
     /**
@@ -51,7 +42,7 @@ class m240731_153143_notification_menu extends Migration
      */
     public function safeDown()
     {
-        // Bildirim menü öğesini silme
+
         $id_item = MenuItem::find()->where(['slug' => 'notification'])->one()->id_item;
         $this->delete('menu_item', ['id_item' => $id_item]);
 

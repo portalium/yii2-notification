@@ -8,7 +8,6 @@ use yii\base\Widget;
 use portalium\notification\Module;
 use Yii;
 use yii\helpers\Html;
-use yii\widgets\Pjax;
 
 class Notification extends Widget
 {
