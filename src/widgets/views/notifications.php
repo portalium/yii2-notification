@@ -49,7 +49,7 @@ NotificationAsset::register($this);
     <ul class="nav">
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-bell-slash" style="padding-left: 10px; padding-right: 20px; margin-top: 3px; color: black;"></i>
+                <i class="fa fa-bell-slash" style="padding-left: 5px; padding-right: 5px; margin-top: 3px; color: black;"></i>
             </a>
             <div class="dropdown-menu" aria-labelledby="notificationDropdown">
                 <h6 class="dropdown-header">No Notifications</h6>
