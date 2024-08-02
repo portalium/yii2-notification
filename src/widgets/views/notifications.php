@@ -52,7 +52,7 @@ NotificationAsset::register($this);
                 <i class="fa fa-bell-slash" style="padding-left: 5px; padding-right: 5px; margin-top: 3px; color: black;"></i>
             </a>
             <div class="dropdown-menu" aria-labelledby="notificationDropdown">
-                <h6 class="dropdown-header">No Notifications</h6>
+                <h6 class="dropdown-header">Notifications</h6>
                 <a class="dropdown-item" href="#">You have no new notifications.</a>
             </div>
         </li>
