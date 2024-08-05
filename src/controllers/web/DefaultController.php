@@ -36,10 +36,14 @@ class DefaultController extends Controller
         if (!\Yii::$app->user->can('notificationWebDefaultIndex'))
             $dataProvider->query->andWhere(['id_to' => \Yii::$app->user->id]);
 
+        $notifications = $dataProvider->getModels();
+        //var_dump(count($notifications));
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'notifications' => $notifications,
         ]);
+
     }
 
     public function actionRead($id)

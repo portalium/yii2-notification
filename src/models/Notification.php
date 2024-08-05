@@ -61,6 +61,7 @@ class Notification extends \yii\db\ActiveRecord
     }
 
     public static function getUnreadNotifications(){
+        //var_dump(self::find()->where([ 'id_to'  => Yii::$app->user->id, 'status' => self::STATUS_UNREAD])->createCommand()->getRawSql());
         return self::find()->where([ 'id_to'  => Yii::$app->user->id, 'status' => self::STATUS_UNREAD])->all();
     }
 

@@ -27,6 +27,5 @@ use portalium\notification\models\Notification;
 <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 <?= $form->field($model, 'text')->textInput(['maxlength' => true]) ?>
 
-
 <?php Panel::end() ?>
 <?php ActiveForm::end(); ?>

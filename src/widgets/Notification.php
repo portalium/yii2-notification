@@ -19,7 +19,7 @@ class Notification extends Widget
     public function init()
     {
         if (!$this->icon) {
-            $this->icon = Html::tag('i', '', ['class' => '', 'style' => 'margin-right: 5px;']);
+            $this->icon = Html::tag('i', '', ['class' => 'fa fa-bell', 'style' => 'margin-right: 5px;']);
         }
         //        $this->display = MenuItem::TYPE_DISPLAY['icon-text'];
 
@@ -32,11 +32,12 @@ class Notification extends Widget
         // if(\Yii::$app->user->can('notificationWebDefaultIndex'))
         // {
         // $notifications = NotificationModel::getAllNotifications();
-        // }
+         //}
         if (\Yii::$app->user->can('notificationWebDefaultIndexOwn'))
-            // {
+           {
             $notifications = NotificationModel::getUnreadNotifications();
-        // }
+            //var_dump(count($notifications)); 
+         }
         else {
             $notifications = [];
         }
