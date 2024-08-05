@@ -6,7 +6,8 @@ use yii\helpers\Html;
 
 NotificationAsset::register($this);
 ?>
-    <?php if (count($notifications) > 0) { ?>
+
+<?php if (count($notifications) > 0) { ?>
 
     <ul class="card-box nav dropdown" id="notification">
         <li class="dropdown nav-item">
@@ -45,16 +46,34 @@ NotificationAsset::register($this);
             <?php echo Html::endTag('ul'); ?>
         </li>
     </ul>
+
 <?php } else { ?>
-    <ul class="nav">
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-bell-slash" style="padding-left: 5px; padding-right: 5px; margin-top: 3px; color: black;"></i>
+
+    <ul class="card-box nav dropdown" id="notification">
+        <li class="dropdown nav-item">
+            <a class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="#" style="padding-left: 0px !important; padding-right: 0px !important; position: relative;">
+                <i class="fa fa-bell-slash" style="padding-left: 20px; padding-right: 10px; margin-top: 10px; color: black;"></i>
+                <span class="dropdown-toggle-icon"><i class="fa fa-caret-down"></i></span>
             </a>
-            <div class="dropdown-menu" aria-labelledby="notificationDropdown">
-                <h6 class="dropdown-header">Notifications</h6>
-                <a class="dropdown-item" href="#">You have no new notifications.</a>
-            </div>
+            <ul class="dropdown-menu notify-drop">
+                <div class="notification-heading">
+                    <span class="menu-title">Notifications</span>
+                </div>
+                <div class="drop-content">
+                    <div class="card" role="presentation">
+                        <div class="d-flex flex-row justify-content-between card-notification-item" style="padding: 10px;">
+                            <p class="card notification-content" role="presentation" style="padding: 8px 0px 8px 17px !important; background: transparent">
+                                <span class="item-title">You have no new notifications.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="notification-footer">
+                    <a href="/notification/default/index?" style="padding-left: 10px !important; width: 100%; display: flex; float: none; text-align: center; align-items: center;">
+                        <span class="menu-title-footer">View all</span>
+                    </a>
+                </div>
+            </ul>
         </li>
     </ul>
 

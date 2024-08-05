@@ -29,15 +29,15 @@ class Notification extends Widget
     //contain the code that generates the rendering result of the widget
     public function run()
     {
-         if(\Yii::$app->user->can('notificationWebDefaultIndex'))
-         {
-         $notifications = NotificationModel::getAllNotifications();
+        // if(\Yii::$app->user->can('notificationWebDefaultIndex'))
+        // {
+        // $notifications = NotificationModel::getAllNotifications();
+         //}
+        if (\Yii::$app->user->can('notificationWebDefaultIndexOwn'))
+           {
+            $notifications = NotificationModel::getUnreadNotifications();
+            //var_dump(count($notifications)); 
          }
-        //if (\Yii::$app->user->can('notificationWebDefaultIndexOwn'))
-         //    {
-        //    $notifications = NotificationModel::getUnreadNotifications();
-        //    var_dump(count($notifications)); 
-        // }
         else {
             $notifications = [];
         }
