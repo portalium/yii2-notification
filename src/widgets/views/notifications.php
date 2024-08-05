@@ -6,8 +6,8 @@ use yii\helpers\Html;
 
 NotificationAsset::register($this);
 ?>
+    <?php if (count($notifications) > 0) { ?>
 
-<?php if (count($notifications) > 0) { ?>
     <ul class="card-box nav dropdown" id="notification">
         <li class="dropdown nav-item">
             <a class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="#" style="padding-left: 0px !important; padding-right: 0px !important; position: relative;">

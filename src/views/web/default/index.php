@@ -16,6 +16,14 @@ use yii\helpers\Url;
 $this->title = Module::t('Notifications');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
+<?php
+/*
+echo $this->render('@vendor/portalium/yii2-notification/src/widgets/views/notification', [
+    'notifications' => $notifications
+]); */
+?>
+
 <?php
 
 
