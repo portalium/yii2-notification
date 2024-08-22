@@ -14,6 +14,7 @@ class Notification extends Widget
     public $options;
     public $display;
     public $icon;
+    public $placement;
 
     //initialize widget properties
     public function init()
