@@ -22,7 +22,7 @@ class m240731_153143_notification_menu extends Migration
                 'label' => 'Notification',
                 'slug' => 'notification',
                 'type' => '2',
-                'style' => '{"icon":"fa fa-bell","color":"black","iconSize":"","display":"1","childDisplay":"1","placement":""}',
+                'style' => '{"icon":"fa fa-bell","color":"black","iconSize":"","display":"1","childDisplay":"1", "placement":"1"}',
                 'data' => '{"data":{"module":"notification","routeType":"widget","route":"portalium\\\\notification\\\\widgets\\\\Notification","model":"","menuRoute":null,"menuType":null}}',
                 'sort' => '16',
                 'id_menu' => '1',
