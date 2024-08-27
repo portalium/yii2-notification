@@ -15,22 +15,21 @@ if ($placement == 'top-to-bottom') {
     .topToBottomNotification a {
         display: flex;
         flex-direction: column;
-        align-items: center;
         text-align: center;
     }
-    .topToBottomNotification i {
 
-    }
     </style>';
 }elseif($placement == 'side-by-side'){
     $placementStyleNotification = 'sideBySideNotification'; 
     echo '<style>
-    .sideBySideNotification dropdown-toggle {
+    .sideBySideNotification  {
         flex-direction: row !important;
+        margin-top: 8px; !important;
+        margin-left: 3px;
     }
-    .sideBySide dropdown-toggle sude,
+    .sideBySide dropdown-toggle,
     .sideBySide .profile span.photo-label {
-        margin-left: 10px;
+        margin-left: 5px;
         margin-top: 0;
     }
     </style>';
@@ -51,7 +50,7 @@ if ($placement == 'top-to-bottom') {
                 <span class="visually-hidden">unread messages</span>
             </span>
             <i class="fa fa-bell" style="padding-left: 20px; padding-right: 20px; margin-top: 3px; color: black !important;"></i>
-            <span class="dropdown-toggle-icon"><i class="fa fa-caret-down"></i></span>
+            <span class="dropdown-toggle-icon" ><i class="fa fa-caret-down"></i></span>
         </a>
         <?php echo Html::beginTag('ul', $options); ?>
         <div class="notification-heading">
@@ -84,11 +83,12 @@ if ($placement == 'top-to-bottom') {
 <?php } else { ?>
 
 <ul class="card-box nav dropdown" id="notification">
-    <li class="dropdown nav-item <?= $placementStyleNotification?>" >
+    <li class="dropdown nav-item <?= $placementStyleNotification?>"  >
         <a class="dropdown-toggle " data-bs-toggle="dropdown" data-bs-placement="<?php echo $placement?>" role="button" aria-haspopup="true" aria-expanded="false" href="#" style="padding-left: 0px !important; padding-right: 0px !important; position: relative;">
-            <i class="fa fa-bell-slash" style="padding-left: 20px; padding-right: 20px; margin-top: 3px; color: black !important;"></i>
+            <i class="fa fa-bell-slash" style="padding-left: 5px; padding-right: 10px; margin-top:3px; color: black !important;"></i>
+            <i style="color: black; margin-right: 12px;  text-align: center; !important"> <?php echo $text  ?> </i>
         </a>
-        <i> <?php echo $text  ?> </i>
+        
         <ul class="dropdown-menu notify-drop">
             <div class="notification-heading">
                 <span class="menu-title">Notifications</span>
