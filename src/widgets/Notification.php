@@ -33,6 +33,7 @@ class Notification extends Widget
             $this->registerCss();
 
         }if($this->placement == 'side-by-side'){
+            $this->options['data-bs-placement'] = $this->placement; 
             $this->registerCss();
         }
 
