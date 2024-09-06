@@ -13,7 +13,6 @@ class Notification extends Component
     { 
         if($id_to == null || User::findOne($id_to) == null)
             return;
-
         $model = new NotificationModel();
         $model->id_to = $id_to;
         $model->text = $text;

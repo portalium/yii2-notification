@@ -5,6 +5,9 @@ use portalium\theme\widgets\ActiveForm;
 use portalium\theme\widgets\Panel;
 use portalium\notification\Module;
 use portalium\notification\models\Notification;
+use portalium\notification\models\NotificationForm;
+use kartik\depdrop\DepDrop;
+use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var portalium\notification\models\Notification $model */
@@ -23,9 +26,41 @@ use portalium\notification\models\Notification;
         ]
     ],
 ]) ?>
-<?= $form->field($model, 'id_to')->dropDownList(Notification::getUserList())->label('User') ?>
-<?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-<?= $form->field($model, 'text')->textInput(['maxlength' => true]) ?>
+
+
+ 
+<?php
+
+
+echo $form->field($notificationForm, 'notificationType', ['options' => ['id' => 'module-list-div']])->dropDownList(Notification::getNotificationType(), ['id' => 'module-list', 'prompt' => 'Select Notification']);
+
+
+echo $form->field($notificationForm, 'receiver_id', ['options' => ['id' => 'recipients-list-div']])->widget(DepDrop::classname(), [
+    'options' => ['id' => 'recipients-list'],
+    'pluginOptions' => [
+        'multiple'=> true,
+        'allowClear' => true,
+        'depends' => ['module-list'],
+        'placeholder' => Module::t('Select...'),
+        'url' => Url::to(['/notification/default/show-notification-type']),
+        'paramsBase' => [
+            Yii::$app->request->csrfParam => Yii::$app->request->csrfToken,
+        ]
+    ] 
+]);
+?> 
+<?= $form->field($notificationForm, 'title')->textInput(['maxlength' => true]) ?>
+<?= $form->field($notificationForm, 'text')->textInput(['maxlength' => true]) ?>
 
 <?php Panel::end() ?>
 <?php ActiveForm::end(); ?>
+
+<?php
+$this->registerJs('
+    $(document).ajaxSend(function(event, jqxhr, settings) {
+        if (settings.type == "POST") {
+            settings.data = settings.data + "&' . Yii::$app->request->csrfParam . '=' . Yii::$app->request->csrfToken . '";
+        }
+    });
+');
+?>
