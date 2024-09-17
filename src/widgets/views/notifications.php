@@ -86,7 +86,7 @@ if ($placement == 'top-to-bottom') {
     <li class="dropdown nav-item <?= $placementStyleNotification?>"  >
         <a class="dropdown-toggle " data-bs-toggle="dropdown" data-bs-placement="<?php echo $placement?>" role="button" aria-haspopup="true" aria-expanded="false" href="#" style="padding-left: 0px !important; padding-right: 0px !important; position: relative;">
             <i class="fa fa-bell-slash" style="padding-left: 5px; padding-right: 10px; margin-top:3px; color: black !important;"></i>
-            <i style="color: black; margin-right: 12px;  text-align: center; !important"> <?php echo $text  ?> </i>
+            <i style="color: black; margin-right: 12px;  text-align: center; font-style: normal !important;"> <?php echo $text  ?> </i>
         </a>
         
         <ul class="dropdown-menu notify-drop">
