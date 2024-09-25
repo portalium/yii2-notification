@@ -58,7 +58,7 @@ if ($placement == 'top-to-bottom') {
         </div>
         <div class="drop-content">
             <div class="card" role="presentation">
-                <?php foreach ($notifications as $notification) { ?>
+                 <?php foreach ($notifications as $notification) { ?>
                     <div class="d-flex flex-row justify-content-between card-notification-item" data-key="<?= $notification->id_notification ?>">
                         <p class="card notification-content" role="presentation" style="padding: 8px 0px 8px 17px !important; background: transparent">
                             <span class="item-title"><?php echo Html::encode($notification->title); ?></span>
