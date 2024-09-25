@@ -21,6 +21,12 @@ class NotificationForm extends Model
     public $receiver_id;
     public $id_notification;
 
+    const NOTIFICATİON_TYPE = [
+        'user' => '1',
+        'role' => '2',
+        'group' => '3',
+    ];
+
     public function rules()
     {
         return [
@@ -48,9 +54,9 @@ class NotificationForm extends Model
     public static function getNotificationType()
     {
         return [
-            '1' => 'User',
-            '2' => 'Role',
-            '3' => 'Group',
+            self::NOTIFICATİON_TYPE['user'] => 'User',
+            self::NOTIFICATİON_TYPE['role'] => 'Role',
+            self::NOTIFICATİON_TYPE['group'] => 'Group',
         ];
     }
     public function save()

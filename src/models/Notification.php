@@ -46,7 +46,7 @@ class Notification extends \yii\db\ActiveRecord
     {
         return [
             'id_notification' => Module::t('Id Notification'),
-            'id_to' =>  Module::t('Id To'),
+            'id_to' =>  Module::t('Receiver'),
             'text' => Module::t('Text'),
             'title' => Module::t('Title'),
             'status' => Module::t('Status'),
@@ -129,9 +129,10 @@ class Notification extends \yii\db\ActiveRecord
     public static function getNotificationType()
     {
         return [
-            '1' => 'User',
-            '2' => 'Role',
-            '3' => 'Group',
+           
+            self::NOTIFICATİON_TYPE['user'] => 'User',
+            self::NOTIFICATİON_TYPE['role'] => 'Role',
+            self::NOTIFICATİON_TYPE['group'] => 'Group',
         ];
     }
 

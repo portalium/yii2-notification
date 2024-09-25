@@ -34,6 +34,11 @@ class m220219_222513_notification_rbac
         $auth->add($notificationWebDefaultView);
         $auth->addChild($admin, $notificationWebDefaultView);
 
+        $notificationWebDefaultRead = $auth->createPermission('notificationWebDefaultRead');
+        $notificationWebDefaultRead->description = 'Notification Web Default update';
+        $auth->add($notificationWebDefaultRead);
+        $auth->addChild($admin, $notificationWebDefaultRead);
+
         $notificationWebDefaultTypeShow = $auth->createPermission('notificationWebDefaultTypeShow');
         $notificationWebDefaultTypeShow->description = 'Notification Web Default Type show';
         $auth->add($notificationWebDefaultTypeShow);
