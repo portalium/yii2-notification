@@ -26,7 +26,8 @@ class NotificationForm extends Model
         return [
             [['notificationType', 'receiver_id', 'text', 'title'], 'required'],
             [['notificationType',  'status'], 'integer'],
-            [['text', 'receiver_id', 'title'], 'string'],
+            [['text', 'title'], 'string'],
+            [['receiver_id'], 'each', 'rule' => ['string']],
         ];
     }
     public function attributeLabels()
@@ -34,7 +35,7 @@ class NotificationForm extends Model
         return [
             'notificationType' => Module::t('Notification Type'),
             'id_notification' => Module::t('Id Notification'),
-            'receiver_id' =>  Module::t('Receiver '),
+            'receiver_id' =>  Module::t('Receiver'),
             'text' => Module::t('Text'),
             'title' => Module::t('Title'),
             'status' => Module::t('Status'),
@@ -55,7 +56,6 @@ class NotificationForm extends Model
     public function save()
     {
         $this->getUserList();
-
         foreach ($this->users as $user) {
             $model = new NotificationModel();
             $model->id_to = (int)$user['id_user'];
@@ -68,10 +68,11 @@ class NotificationForm extends Model
     public function getUserList()
     {
         if ($this->notificationType == 1) {
-
+            $this->users = array_map(function ($id) {
+                return ['id_user' => $id];
+            }, $this->receiver_id);
             return $this->users;
         } elseif ($this->notificationType == 2) {
-
             $this->users = (new \yii\db\Query())
                 ->select(' a.user_id')
                 ->distinct()
@@ -84,7 +85,6 @@ class NotificationForm extends Model
 
             return $this->users;
         } elseif ($this->notificationType == 3) {
-
             $this->users = (new \yii\db\Query())
                 ->select(' u.id_user')
                 ->distinct()

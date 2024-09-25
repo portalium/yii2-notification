@@ -128,8 +128,6 @@ class DefaultController extends Controller
         }
         return $this->redirect(['index']);
     }
-
-    // İSMİ DEĞİŞECEK --> PERMİSSİON İSMİNİ DE DEĞİŞTİRMEYİ UNUTMA
     public function actionShowNotificationType()
     {
         if(!\Yii::$app->user->can('notificationWebDefaultTypeShow')){
@@ -148,19 +146,19 @@ class DefaultController extends Controller
                     case 1:
                          $notifications = Notification::getUserListNotification();
                          foreach ($notifications as $notification ) {
-                            $out[] = ['id' => $notification['id_user'], 'name' =>$notification['username']];
+                            $out[] = ['id' => (string)$notification['id_user'], 'name' =>$notification['username']];
                         }
                          break;
                     case 2:
                         $notifications = Notification::getRolesList();
                         foreach ($notifications as $key => $notification ) {
-                           $out[] = ['id' => $notification->name, 'name' => $notification->name,];
+                           $out[] = ['id' =>(string)$notification->name, 'name' => $notification->name,];
                         } 
                        break;
                     case 3:
                         $notifications = Notification::getGroupList();
                         foreach ($notifications as $notification ) {
-                           $out[] = ['id' => $notification['id_group'], 'name' => $notification['name']];
+                           $out[] = ['id' => (string)$notification['id_group'], 'name' => $notification['name']];
                         }  
                         break;
                 }

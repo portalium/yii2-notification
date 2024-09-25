@@ -36,10 +36,10 @@ echo $form->field($notificationForm, 'notificationType', ['options' => ['id' => 
 
 
 echo $form->field($notificationForm, 'receiver_id', ['options' => ['id' => 'recipients-list-div']])->widget(DepDrop::classname(), [
-    'options' => ['id' => 'recipients-list'],
+    'options' => ['id' => 'recipients-list',
+        'multiple' =>true],
+    'type' => DepDrop::TYPE_SELECT2,
     'pluginOptions' => [
-        'multiple'=> true,
-        'allowClear' => true,
         'depends' => ['module-list'],
         'placeholder' => Module::t('Select...'),
         'url' => Url::to(['/notification/default/show-notification-type']),
