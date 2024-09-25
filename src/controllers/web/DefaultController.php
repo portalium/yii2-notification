@@ -48,14 +48,14 @@ class DefaultController extends Controller
 
     public function actionRead($id)
     {
-        // if (!\Yii::$app->user->can('notificationWebDefaultDelete', ['model' => Notification::findModel($id)])) {
-        // throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
-        // }
+         if (!\Yii::$app->user->can('notificationWebDefaultRead', ['model' => Notification::findModel($id)])) {
+         throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+         }
 
         if ($model = Notification::findModel($id)) {
             $model->status = Notification::STATUS_READ;
             $model->save();
-            // Yii::$app->session->addFlash('info', Module::t('Notification has been deleted'));
+           
         }
         if (Yii::$app->request->isAjax) {
             return $this->asJson(['success' => true]);
