@@ -52,7 +52,7 @@ class m220219_222513_notification_rbac
         $auth->remove($auth->getPermission('notificationWebDefaultIndex'));
         $auth->remove($auth->getPermission('notificationWebDefaultCreate'));
         $auth->remove($auth->getPermission('notificationWebDefaultDelete'));
-        $auth->remove($auth->getPermission('$notificationWebDefaultUpdate'));
+        $auth->remove($auth->getPermission('notificationWebDefaultUpdate'));
         $auth->remove($auth->getPermission('notificationWebDefaultView'));
         $auth->remove($auth->getPermission('notificationWebDefaultRead'));
         $auth->remove($auth->getPermission('notificationWebDefaultTypeShow'));
