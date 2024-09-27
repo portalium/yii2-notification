@@ -2,15 +2,31 @@
 
 namespace portalium\notification\models;
 
+use portalium\content\models\Category as ModelsCategory;
 use portalium\user\models\User;
+use portalium\workspace\models\Workspace;
 use Yii;
 use portalium\notification\Module;
+use portalium\rbac\models\Assignment;
+use portalium\rbac\models\AuthItemSearch;
+use portalium\user\models\Group;
+use portalium\user\models\UserGroup;
 use yii\web\NotFoundHttpException;
+
+
+
 
 class Notification extends \yii\db\ActiveRecord
 {
+    public $recipients;
     const STATUS_UNREAD = 0;
     const STATUS_READ = 1;
+
+    const NOTIFICATİON_TYPE = [
+        'user' => '1',
+        'role' => '2',
+        'group' => '3',
+    ];
 
     public static function tableName()
     {
@@ -29,11 +45,17 @@ class Notification extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id_notification' => 'Id Notification',
-            'id_to' => 'Id To',
-            'text' => 'Text',
-            'title' => 'Title',
-            'status' => 'Status',
+            'id_notification' => Module::t('Id Notification'),
+            'id_to' =>  Module::t('Receiver'),
+            'text' => Module::t('Text'),
+            'title' => Module::t('Title'),
+            'status' => Module::t('Status'),
+            'user' => Module::t('User'),
+            'workspace' => Module::t('Workspace'),
+            'role' => Module::t('Role'),
+            'group' => Module::t('Group'),
+
+
         ];
     }
 
@@ -47,26 +69,82 @@ class Notification extends \yii\db\ActiveRecord
         $items = [];
         $users = User::find()->all();
         foreach ($users as $user) {
-            $items[$user->id_user] = $user->first_name. " " .$user->last_name;
+            $items[$user->id_user] = $user->first_name . " " . $user->last_name;
         }
         return $items;
     }
 
-    public static function getRelatedNotifications(){
-        return self::find()->where([ 'id_to'  => Yii::$app->user->id])->all();
+    public static function getUserListNotification()
+    {
+        $users = User::find()
+            ->select(['id_user', 'username'])
+            ->asArray()
+            ->all();
+        if (!$users) {
+            return null;
+        }
+        return $users;
     }
 
-    public static function getAllNotifications(){
+    public static function getWorkspaceList()
+    {
+        $workspaces = Workspace::find()
+            ->select(['id_workspace', 'name'])
+            ->asArray()
+            ->all();
+        if (!$workspaces) {
+            return null;
+        }
+        return $workspaces;
+    }
+    public static function getRolesList()
+    {
+        //$assigment = new Assignment();
+        //$manager = Yii::$app->authManager;
+        $auth = Yii::$app->authManager;
+        $roles = $auth->getRoles();
+        return $roles;
+    }
+    public static function getGroupList()
+    {
+        $groups = Group::find()
+            ->select(['id_group', 'name'])
+            ->asArray()
+            ->all();
+        if (!$groups) {
+            return null;
+        }
+        return $groups;
+    }
+    public static function getRelatedNotifications()
+    {
+        return self::find()->where(['id_to'  => Yii::$app->user->id])->all();
+    }
+
+    public static function getAllNotifications()
+    {
         return self::find()->all();
     }
 
-    public static function getUnreadNotifications(){
-        //var_dump(self::find()->where([ 'id_to'  => Yii::$app->user->id, 'status' => self::STATUS_UNREAD])->createCommand()->getRawSql());
-        return self::find()->where([ 'id_to'  => Yii::$app->user->id, 'status' => self::STATUS_UNREAD])->all();
+    public static function getNotificationType()
+    {
+        return [
+           
+            self::NOTIFICATİON_TYPE['user'] => 'User',
+            self::NOTIFICATİON_TYPE['role'] => 'Role',
+            self::NOTIFICATİON_TYPE['group'] => 'Group',
+        ];
     }
 
-    public static function getReadNotifications(){
-        return self::find()->where([ 'id_to'  => Yii::$app->user->id, 'status' => self::STATUS_READ])->all();
+    public static function getUnreadNotifications()
+    {
+        //var_dump(self::find()->where([ 'id_to'  => Yii::$app->user->id, 'status' => self::STATUS_UNREAD])->createCommand()->getRawSql());
+        return self::find()->where(['id_to'  => Yii::$app->user->id, 'status' => self::STATUS_UNREAD])->all();
+    }
+
+    public static function getReadNotifications()
+    {
+        return self::find()->where(['id_to'  => Yii::$app->user->id, 'status' => self::STATUS_READ])->all();
     }
 
     public static function getStatusList()
@@ -82,7 +160,6 @@ class Notification extends \yii\db\ActiveRecord
         if (($model = Notification::findOne(['id_notification' => $id])) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException(Module::t('The requested page does not exist.'));
     }
 }

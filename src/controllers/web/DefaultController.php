@@ -3,6 +3,7 @@
 namespace portalium\notification\controllers\web;
 
 use portalium\notification\models\Notification;
+use portalium\notification\models\NotificationForm;
 use portalium\notification\models\NotificationSearch;
 use portalium\web\Controller;
 use portalium\notification\Module;
@@ -32,7 +33,7 @@ class DefaultController extends Controller
         }
         $searchModel = new NotificationSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
-        
+
         if (!\Yii::$app->user->can('notificationWebDefaultIndex'))
             $dataProvider->query->andWhere(['id_to' => \Yii::$app->user->id]);
 
@@ -43,19 +44,18 @@ class DefaultController extends Controller
             'dataProvider' => $dataProvider,
             'notifications' => $notifications,
         ]);
-
     }
 
     public function actionRead($id)
     {
-        // if (!\Yii::$app->user->can('notificationWebDefaultDelete', ['model' => Notification::findModel($id)])) {
-            // throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
-        // }
+         if (!\Yii::$app->user->can('notificationWebDefaultRead', ['model' => Notification::findModel($id)])) {
+         throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+         }
 
         if ($model = Notification::findModel($id)) {
             $model->status = Notification::STATUS_READ;
             $model->save();
-            // Yii::$app->session->addFlash('info', Module::t('Notification has been deleted'));
+           
         }
         if (Yii::$app->request->isAjax) {
             return $this->asJson(['success' => true]);
@@ -82,21 +82,21 @@ class DefaultController extends Controller
     {
         if (!\Yii::$app->user->can('notificationWebDefaultCreate')) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
-        }
-
+        }   
+        $notificationForm = new NotificationForm();
         $model = new Notification();
-
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($notificationForm->load($this->request->post()) && $notificationForm->save()) {
+                Yii::warning($notificationForm->receiver_id);
                 return $this->redirect(['view', 'id' => $model->id_notification]);
             }
-        } else {
+        }else {
             $model->loadDefaultValues();
         }
-
         return $this->render('create', [
-            'model' => $model,
+            'notificationForm' => $notificationForm,
         ]);
+
     }
 
     public function actionUpdate($id)
@@ -127,5 +127,44 @@ class DefaultController extends Controller
             Yii::$app->session->addFlash('info', Module::t('Notification has been deleted'));
         }
         return $this->redirect(['index']);
+    }
+    public function actionShowNotificationType()
+    {
+        if(!\Yii::$app->user->can('notificationWebDefaultTypeShow')){
+        throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        }
+        $out = [];
+        if ($this->request->isPost) {
+            $request = $this->request->post('depdrop_parents');
+
+            $notificationType = $request[0] ?? null;
+
+            if (!$notificationType) {
+                return $this->asJson(['output' => [], 'selected' => '']);
+            } else{
+                switch ($notificationType){
+                    case 1:
+                         $notifications = Notification::getUserListNotification();
+                         foreach ($notifications as $notification ) {
+                            $out[] = ['id' => (string)$notification['id_user'], 'name' =>$notification['username']];
+                        }
+                         break;
+                    case 2:
+                        $notifications = Notification::getRolesList();
+                        foreach ($notifications as $key => $notification ) {
+                           $out[] = ['id' =>(string)$notification->name, 'name' => $notification->name,];
+                        } 
+                       break;
+                    case 3:
+                        $notifications = Notification::getGroupList();
+                        foreach ($notifications as $notification ) {
+                           $out[] = ['id' => (string)$notification['id_group'], 'name' => $notification['name']];
+                        }  
+                        break;
+                }
+                return json_encode(['output' => $out, 'selected' => '']);
+            }
+            
+        }
     }
 }
