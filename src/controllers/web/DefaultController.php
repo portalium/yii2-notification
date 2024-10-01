@@ -2,13 +2,14 @@
 
 namespace portalium\notification\controllers\web;
 
+use Yii;
+use yii\filters\VerbFilter;
+use portalium\web\Controller;
+use portalium\user\models\User;
+use portalium\notification\Module;
 use portalium\notification\models\Notification;
 use portalium\notification\models\NotificationForm;
 use portalium\notification\models\NotificationSearch;
-use portalium\web\Controller;
-use portalium\notification\Module;
-use yii\filters\VerbFilter;
-use Yii;
 
 class DefaultController extends Controller
 {
@@ -82,21 +83,28 @@ class DefaultController extends Controller
     {
         if (!\Yii::$app->user->can('notificationWebDefaultCreate')) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
-        }   
+        }
+
         $notificationForm = new NotificationForm();
         $model = new Notification();
+
         if ($this->request->isPost) {
             if ($notificationForm->load($this->request->post()) && $notificationForm->save()) {
-                Yii::warning($notificationForm->receiver_id);
-                return $this->redirect(['view', 'id' => $model->id_notification]);
+                $idTo = Yii::$app->request->post('Notification')['id_to'];
+                $user = User::findOne($idTo);
+                $title = $this->request->post('Notification')['title'];
+                $text = $this->request->post('Notification')['text'];
+                Yii::$app->notification->sendEmail($user, $text, $title);
+
+                return $this->redirect(['view', 'id' => $notificationForm->id_notification]);
             }
-        }else {
+        } else {
             $model->loadDefaultValues();
         }
+
         return $this->render('create', [
             'notificationForm' => $notificationForm,
         ]);
-
     }
 
     public function actionUpdate($id)
