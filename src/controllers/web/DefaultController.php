@@ -33,7 +33,7 @@ class DefaultController extends Controller
         }
         $searchModel = new NotificationSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
-        
+
         if (!\Yii::$app->user->can('notificationWebDefaultIndex'))
             $dataProvider->query->andWhere(['id_to' => \Yii::$app->user->id]);
 
@@ -44,13 +44,12 @@ class DefaultController extends Controller
             'dataProvider' => $dataProvider,
             'notifications' => $notifications,
         ]);
-
     }
 
     public function actionRead($id)
     {
         // if (!\Yii::$app->user->can('notificationWebDefaultDelete', ['model' => Notification::findModel($id)])) {
-            // throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        // throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         // }
 
         if ($model = Notification::findModel($id)) {
@@ -84,26 +83,30 @@ class DefaultController extends Controller
         if (!\Yii::$app->user->can('notificationWebDefaultCreate')) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
+
+        $notificationForm = new NotificationForm();
         $model = new Notification();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save() ) {
+            if ($notificationForm->load($this->request->post()) && $notificationForm->save()) {
                 $idTo = Yii::$app->request->post('Notification')['id_to'];
                 $user = User::findOne($idTo);
-                $title=$this->request->post('Notification')['title'];
-                $text=$this->request->post('Notification')['text'];
+                $title = $this->request->post('Notification')['title'];
+                $text = $this->request->post('Notification')['text'];
                 Yii::$app->notification->sendEmail($user, $text, $title);
-                return $this->redirect(['view', 'id' => $model->id_notification]);
+
+                return $this->redirect(['view', 'id' => $notificationForm->id_notification]);
             }
         } else {
             $model->loadDefaultValues();
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'notificationForm' => $notificationForm,
         ]);
     }
-    
+
+
 
     public function actionUpdate($id)
     {
