@@ -6,6 +6,7 @@ use portalium\notification\models\Notification;
 use portalium\notification\models\NotificationSearch;
 use portalium\web\Controller;
 use portalium\notification\Module;
+use portalium\user\models\User;
 use yii\filters\VerbFilter;
 use Yii;
 
@@ -83,11 +84,15 @@ class DefaultController extends Controller
         if (!\Yii::$app->user->can('notificationWebDefaultCreate')) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
-
         $model = new Notification();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($model->load($this->request->post()) && $model->save() ) {
+                $idTo = Yii::$app->request->post('Notification')['id_to'];
+                $user = User::findOne($idTo);
+                $title=$this->request->post('Notification')['title'];
+                $text=$this->request->post('Notification')['text'];
+                Yii::$app->notification->sendEmail($user, $text, $title);
                 return $this->redirect(['view', 'id' => $model->id_notification]);
             }
         } else {
@@ -98,6 +103,7 @@ class DefaultController extends Controller
             'model' => $model,
         ]);
     }
+    
 
     public function actionUpdate($id)
     {
