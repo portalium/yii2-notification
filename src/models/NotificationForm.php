@@ -20,6 +20,7 @@ class NotificationForm extends Model
     public $notificationType;
     public $receiver_id;
     public $id_notification;
+    public $send_email;
 
     const NOTIFICATİON_TYPE = [
         'user' => '1',
@@ -67,9 +68,13 @@ class NotificationForm extends Model
             $model->id_to = (int)$user['id_user'];
             $model->text = $this->text;
             $model->title = $this->title;
-            $model->save();
+            if($model->save() && $this->send_email){
+                $userEmail = User::findOne($model->id_to);
+                Yii::$app->notification->sendEmail($userEmail, $model->text, $model->title);
+            }
         }
     }
+
 
     public function getUserList()
     {

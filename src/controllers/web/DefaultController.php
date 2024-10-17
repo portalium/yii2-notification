@@ -86,6 +86,7 @@ class DefaultController extends Controller
         $notificationForm = new NotificationForm();
         $model = new Notification();
         if ($this->request->isPost) {
+            $notificationForm->send_email=$this->request->post('NotificationForm')['send_email'];
             if ($notificationForm->load($this->request->post()) && $notificationForm->save()) {
                 Yii::warning($notificationForm->receiver_id);
                 return $this->redirect(['view', 'id' => $model->id_notification]);

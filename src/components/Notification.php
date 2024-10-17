@@ -5,6 +5,7 @@ namespace portalium\notification\components;
 use yii\base\Component;
 use portalium\notification\models\Notification as NotificationModel;
 use portalium\user\models\User;
+use Yii;
 
 class Notification extends Component
 {
@@ -18,5 +19,22 @@ class Notification extends Component
         $model->text = $text;
         $model->title = $title;
         $model->save();
+    }
+
+    public function sendEmail($user, $text, $title)
+    {
+        Yii::$app->site->mailer->setViewPath(Yii::getAlias('@portalium/notification/mail'));
+        return Yii::$app
+            ->site
+            ->mailer
+            ->compose(
+                ['html' => 'notificationEmail-html', 'text' => 'notificationEmail-text'],
+                ['user' => $user,'text'=> $text, 'title'=> $title]                 
+                )
+            ->setFrom([Yii::$app->setting->getValue('email::address') => Yii::$app->setting->getValue('email::displayname')])
+            ->setTo($user->email)
+            ->setSubject('Notification ' .  Yii::$app->setting->getValue('app::title'))
+            ->send();
+             
     }
 }
