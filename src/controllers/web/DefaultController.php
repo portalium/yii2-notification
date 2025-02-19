@@ -163,19 +163,19 @@ class DefaultController extends Controller
                 return $this->asJson(['output' => [], 'selected' => '']);
             } else {
                 switch ($notificationType) {
-                    case 1:
+                    case Notification::NOTIFICATION_TYPE_USER:
                         $notifications = Notification::getUserListNotification();
                         foreach ($notifications as $notification) {
                             $out[] = ['id' => (string)$notification['id_user'], 'name' => $notification['username']];
                         }
                         break;
-                    case 2:
+                    case Notification::NOTIFICATION_TYPE_ROLE:
                         $notifications = Notification::getRolesList();
                         foreach ($notifications as $key => $notification) {
                             $out[] = ['id' => (string)$notification->name, 'name' => $notification->name,];
                         }
                         break;
-                    case 3:
+                    case Notification::NOTIFICATION_TYPE_GROUP:
                         $notifications = Notification::getGroupList();
                         foreach ($notifications as $notification) {
                             $out[] = ['id' => (string)$notification['id_group'], 'name' => $notification['name']];
