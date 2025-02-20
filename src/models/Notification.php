@@ -22,11 +22,9 @@ class Notification extends \yii\db\ActiveRecord
     const STATUS_UNREAD = 0;
     const STATUS_READ = 1;
 
-    const NOTIFICATİON_TYPE = [
-        'user' => '1',
-        'role' => '2',
-        'group' => '3',
-    ];
+    const NOTIFICATION_TYPE_USER = 1;
+    const NOTIFICATION_TYPE_ROLE = 2;
+    const NOTIFICATION_TYPE_GROUP = 3;
 
     public static function tableName()
     {
@@ -130,9 +128,9 @@ class Notification extends \yii\db\ActiveRecord
     {
         return [
            
-            self::NOTIFICATİON_TYPE['user'] => 'User',
-            self::NOTIFICATİON_TYPE['role'] => 'Role',
-            self::NOTIFICATİON_TYPE['group'] => 'Group',
+            self::NOTIFICATION_TYPE_USER => 'User',
+            self::NOTIFICATION_TYPE_ROLE => 'Role',
+            self::NOTIFICATION_TYPE_GROUP => 'Group',
         ];
     }
 
