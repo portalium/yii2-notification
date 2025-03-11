@@ -6,7 +6,7 @@ use yii\helpers\Html;
 
 NotificationAsset::register($this);
 
-$text = 'Notification';
+$text = Module::t('Notifications');
 $iconSize = (isset($style['iconSize']) && $style['iconSize'] != '') ? $style['iconSize'] : 20;
 $placementStyleNotification='';
 if ($placement == 'top-to-bottom') {
@@ -91,20 +91,20 @@ if ($placement == 'top-to-bottom') {
         
         <ul class="dropdown-menu notify-drop">
             <div class="notification-heading">
-                <span class="menu-title">Notifications</span>
+                <span class="menu-title"><?php echo Module::t('Notifications'); ?></span>
             </div>
             <div class="drop-content">
                 <div class="card" role="presentation">
                     <div class="d-flex flex-row justify-content-between card-notification-item" style="padding: 10px;">
                         <p class="card notification-content" role="presentation" style="padding: 8px 0px 8px 17px !important; background: transparent">
-                            <span class="item-title">You have no new notifications.</span>
+                            <span class="item-title"><?php echo Module::t('You have no new notifications.'); ?></span>
                         </p>
                     </div>
                 </div>
             </div>
             <div class="notification-footer">
                 <a href="/notification/default/index?" style="padding-left: 10px !important; width: 100%; display: flex; float: none; text-align: center; align-items: center;">
-                    <span class="menu-title-footer">View all</span>
+                    <span class="menu-title-footer"><?php echo Module::t('View all')?></span>
                 </a>
             </div>
         </ul>

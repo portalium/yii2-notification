@@ -2,6 +2,7 @@
 
 namespace portalium\notification\controllers\web;
 
+use mysql_xdevapi\Warning;
 use portalium\notification\models\Notification;
 use portalium\notification\models\NotificationForm;
 use portalium\notification\models\NotificationSearch;
@@ -126,14 +127,25 @@ class DefaultController extends Controller
         }
 
         $model = Notification::findModel($id);
+        $notificationForm = new NotificationForm();
+        $notificationForm->text = $model->text;
+        $notificationForm->title = $model->title;
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            Yii::$app->session->addFlash('success', Module::t('Notification has been updated'));
-            return $this->redirect(['view', 'id' => $model->id_notification]);
+        if ($notificationForm->load($this->request->post()))
+        {
+            $model->title = $notificationForm->title;
+            $model->text = $notificationForm->text;
+
+            if ($model->save())
+            {
+                Yii::$app->session->addFlash('success', Module::t('Notification has been updated'));
+                return $this->redirect(['view', 'id' => $model->id_notification]);
+            }
         }
 
         return $this->render('update', [
             'model' => $model,
+            'notificationForm' => $notificationForm,
         ]);
     }
 
