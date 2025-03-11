@@ -31,15 +31,7 @@ Panel::begin([
     'title' => Module::t('Notification'),
     'actions' => [
         'header' => [
-            Html::submitButton(Module::t(''), [
-                'class' => 'fa fa-trash btn btn-danger', 'id' => 'delete-select',
-                'data' => [
-                    'confirm' => Module::t('If you continue, all your data will be reset. Do you want to continue?'),
-                    'method' => 'post'
-
-                ]
-            ]),
-            Html::a(Module::t(''), ['create'], ['class' => 'fa fa-plus btn btn-success']),
+            Html::a('', ['create'], ['class' => 'fa fa-plus btn btn-success', 'title' => Module::t('Create')]),
         ]
     ]
 ]) ?>
@@ -48,7 +40,7 @@ Panel::begin([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'columns' => [
-        ['class' => 'yii\grid\SerialColumn'],
+        ['class' => 'portalium\grid\SerialColumn'],
 
         'user.username',
         [
@@ -68,7 +60,7 @@ Panel::begin([
 
         ],
         [
-            'class' => ActionColumn::class,
+            'class' => ActionColumn::class, 'header' => Module::t('Actions'),
             'template' => '{view} {update} {assignment} {delete}',
             'buttons' => [
 
