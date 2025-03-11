@@ -2,7 +2,6 @@
 
 namespace portalium\notification\controllers\web;
 
-use mysql_xdevapi\Warning;
 use portalium\notification\models\Notification;
 use portalium\notification\models\NotificationForm;
 use portalium\notification\models\NotificationSearch;
