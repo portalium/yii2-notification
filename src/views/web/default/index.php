@@ -25,13 +25,19 @@ echo $this->render('@vendor/portalium/yii2-notification/src/widgets/views/notifi
 ?>
 
 <?php
-
-
 Panel::begin([
     'title' => Module::t('Notification'),
     'actions' => [
         'header' => [
-            Html::a('', ['create'], ['class' => 'fa fa-plus btn btn-success', 'title' => Module::t('Create')]),
+            Html::submitButton(Module::t(''), [
+                'class' => 'fa fa-trash btn btn-danger', 'id' => 'delete-select', 'title' => Module::t('Delete'),
+                'data' => [
+                    'confirm' => Module::t('If you continue, all your data will be reset. Do you want to continue?'),
+                    'method' => 'post',
+
+                ]
+            ]),
+            Html::a(Module::t(''), ['create'], ['class' => 'fa fa-plus btn btn-success', 'title' => Module::t('Create')]),
         ]
     ]
 ]) ?>

@@ -23,5 +23,6 @@ return [
     'Update' => 'Güncelle',
     'You have no new notifications.' => 'Yeni bildiriminiz yok.',
     'View all' => 'Tümünü Göster',
+    'If you continue, all your data will be reset. Do you want to continue?' => 'Devam ederseniz tüm verileriniz sıfırlanacaktır. Devam etmek istiyor musunuz?',
 
 ];
