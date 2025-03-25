@@ -159,6 +159,25 @@ class DefaultController extends Controller
         }
         return $this->redirect(['index']);
     }
+
+    public function actionDeleteAll()
+    {
+        $deletedCount = 0;
+
+        foreach (Notification::find()->all() as $notification)
+            if (\Yii::$app->user->can('notificationWebDefaultDeleteAll') && $notification->delete())
+                $deletedCount++;
+        Yii::$app->session->setFlash(
+            $deletedCount ? 'success' : 'error',
+            Module::t(
+                $deletedCount ? "{count} notifications have been deleted." : "No notifications found to delete or you do not have permission.",
+                ['count' => $deletedCount]
+            )
+        );
+
+        return $this->redirect(['index']);
+    }
+
     public function actionShowNotificationType()
     {
         if (!\Yii::$app->user->can('notificationWebDefaultTypeShow')) {

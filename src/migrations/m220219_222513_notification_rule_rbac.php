@@ -17,7 +17,7 @@ class m220219_222513_notification_rule_rbac extends Migration
             'notificationWebDefaultIndexOwn',
             'notificationWebDefaultViewOwn',
             'notificationWebDefaultDeleteOwn',
-            'notificationWebDefaultUpdateOwn'
+            'notificationWebDefaultUpdateOwn',
         ];
 
         foreach ($permissionsName as $permissionName)
