@@ -164,12 +164,9 @@ class DefaultController extends Controller
     {
         $deletedCount = 0;
 
-        foreach (Notification::find()->all() as $notification) {
-            if (\Yii::$app->user->can('notificationWebDefaultDeleteAll') && $notification->delete()) {
+        foreach (Notification::find()->all() as $notification)
+            if (\Yii::$app->user->can('notificationWebDefaultDeleteAll') && $notification->delete())
                 $deletedCount++;
-            }
-        }
-
         Yii::$app->session->setFlash(
             $deletedCount ? 'success' : 'error',
             Module::t(
@@ -180,9 +177,6 @@ class DefaultController extends Controller
 
         return $this->redirect(['index']);
     }
-
-
-
 
     public function actionShowNotificationType()
     {
