@@ -159,6 +159,23 @@ class DefaultController extends Controller
         }
         return $this->redirect(['index']);
     }
+    public function actionDeleteAll()
+    {
+        if (!\Yii::$app->user->can('notificationWebDefaultDeleteAll')) {
+            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        }
+        if (Yii::$app->request->isPost && Notification::deleteAll()) {
+
+            Yii::$app->session->setFlash('success', Module::t('All notifications have been cleared successfully.'));
+        }
+        else {
+            Yii::$app->session->setFlash('error', Module::t('No notifications found to delete or an error occurred.'));
+        }
+
+        return $this->redirect(['index']);
+    }
+
+
     public function actionShowNotificationType()
     {
         if (!\Yii::$app->user->can('notificationWebDefaultTypeShow')) {

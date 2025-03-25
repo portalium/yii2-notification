@@ -23,6 +23,11 @@ echo $this->render('@vendor/portalium/yii2-notification/src/widgets/views/notifi
     'notifications' => $notifications
 ]); */
 ?>
+<?php $form = ActiveForm::begin([
+    'action' => ['default/delete-all'],
+    'method' => 'post',
+]);
+?>
 
 <?php
 Panel::begin([
@@ -30,7 +35,7 @@ Panel::begin([
     'actions' => [
         'header' => [
             Html::submitButton(Module::t(''), [
-                'class' => 'fa fa-trash btn btn-danger', 'id' => 'delete-select', 'title' => Module::t('Delete'),
+                'class' => 'fa fa-trash btn btn-danger', 'id' => 'delete-select', 'title' => Module::t('Delete All'),
                 'data' => [
                     'confirm' => Module::t('If you continue, all your data will be reset. Do you want to continue?'),
                     'method' => 'post',
@@ -78,4 +83,5 @@ Panel::begin([
     ],
 ]); ?>
 <?php Panel::end();
+ActiveForm::end();
 ?>
