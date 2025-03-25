@@ -17,7 +17,8 @@ class m220219_222513_notification_rule_rbac extends Migration
             'notificationWebDefaultIndexOwn',
             'notificationWebDefaultViewOwn',
             'notificationWebDefaultDeleteOwn',
-            'notificationWebDefaultUpdateOwn'
+            'notificationWebDefaultUpdateOwn',
+            'notificationWebDefaultDeleteAllOwn'
         ];
 
         foreach ($permissionsName as $permissionName)
@@ -48,6 +49,7 @@ class m220219_222513_notification_rule_rbac extends Migration
         $auth->remove($auth->getPermission('notificationWebDefaultViewOwn'));
         $auth->remove($auth->getPermission('notificationWebDefaultDeleteOwn'));
         $auth->remove($auth->getPermission('notificationWebDefaultUpdateOwn'));
+        $auth->remove($auth->getPermission('notificationWebDefaultDeleteAllOwn'));
     }
 
 }
