@@ -161,7 +161,7 @@ class DefaultController extends Controller
     }
     public function actionDeleteAll()
     {
-        if (!\Yii::$app->user->can('notificationWebDefaultDeleteAll')) {
+        if (!\Yii::$app->user->can('notificationWebDefaultDeleteAll') && !\Yii::$app->user->can('notificationWebDefaultDeleteAllOwn')) {
             throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
         }
         if (Yii::$app->request->isPost && Notification::deleteAll()) {
