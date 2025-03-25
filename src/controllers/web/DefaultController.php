@@ -86,22 +86,17 @@ class DefaultController extends Controller
         $notificationForm = new NotificationForm();
         $model = new Notification();
         if ($this->request->isPost) {
-
             if ($notificationForm->load($this->request->post())) {
-
                 $users = $notificationForm->getUserList();
-
                 if (empty($users)) {
                     $model->loadDefaultValues();
                     return $this->render('create', ['notificationForm' => $notificationForm]);
                 }
-
                 foreach ($users as $user) {
                     $model = new Notification();
                     $model->id_to = (int) $user['id_user'];
                     $model->text = $notificationForm->text;
                     $model->title = $notificationForm->title;
-
                     if ($model->save()) {
                         if ($notificationForm->send_email) {
                             $userEmail = User::findOne($model->id_to);

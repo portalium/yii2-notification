@@ -35,6 +35,8 @@ class NotificationForm extends Model
             [['notificationType',  'status'], 'integer'],
             [['text', 'title'], 'string'],
             [['receiver_id'], 'each', 'rule' => ['string']],
+            [['send_email'], 'boolean'],
+            [['send_email'], 'default', 'value' => false],
         ];
     }
     public function attributeLabels()

@@ -51,9 +51,9 @@ echo $form->field($notificationForm, 'receiver_id', ['options' => ['id' => 'reci
 ?>
 <?= $form->field($notificationForm, 'title')->textInput(['maxlength' => true]) ?>
 <?= $form->field($notificationForm, 'text')->textInput(['maxlength' => true]) ?>
-
+<?php if ($this->context->action->id === 'create'): ?>
 <?= $form->field($notificationForm, 'send_email')->checkbox(['label' => Module::t('Send as Email')]) ?>
-
+<?php endif; ?>
 
 <?php Panel::end() ?>
 <?php ActiveForm::end(); ?>
