@@ -159,21 +159,29 @@ class DefaultController extends Controller
         }
         return $this->redirect(['index']);
     }
+
     public function actionDeleteAll()
     {
-        if (!\Yii::$app->user->can('notificationWebDefaultDeleteAll') && !\Yii::$app->user->can('notificationWebDefaultDeleteAllOwn')) {
-            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
-        }
-        if (Yii::$app->request->isPost && Notification::deleteAll()) {
+        $deletedCount = 0;
 
-            Yii::$app->session->setFlash('success', Module::t('All notifications have been cleared successfully.'));
+        foreach (Notification::find()->all() as $notification) {
+            if (\Yii::$app->user->can('notificationWebDefaultDeleteAll') && $notification->delete()) {
+                $deletedCount++;
+            }
         }
-        else {
-            Yii::$app->session->setFlash('error', Module::t('No notifications found to delete or an error occurred.'));
-        }
+
+        Yii::$app->session->setFlash(
+            $deletedCount ? 'success' : 'error',
+            Module::t(
+                $deletedCount ? "{count} notifications have been deleted." : "No notifications found to delete or you do not have permission.",
+                ['count' => $deletedCount]
+            )
+        );
 
         return $this->redirect(['index']);
     }
+
+
 
 
     public function actionShowNotificationType()

@@ -25,7 +25,7 @@ return [
     'View all' => 'Tümünü Göster',
     'If you continue, all your data will be reset. Do you want to continue?' => 'Devam ederseniz tüm verileriniz sıfırlanacaktır. Devam etmek istiyor musunuz?',
     'Delete All' => 'Tümünü Sil',
-    'All notifications have been cleared successfully.' => 'Tüm bildirimler başarıyla silindi.',
-    'No notifications found to delete or an error occurred.' =>  'Silinecek bildirim bulunamadı veya hata oluştu.',
+    'No notifications found to delete or you do not have permission.' =>  'Silinecek bildirim bulunamadı veya izniniz yok.',
+    '{count} notifications have been deleted.' => '{count} bildirim silindi.',
 
 ];
