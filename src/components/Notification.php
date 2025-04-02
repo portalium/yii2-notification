@@ -29,12 +29,12 @@ class Notification extends Component
             ->mailer
             ->compose(
                 ['html' => 'notificationEmail-html', 'text' => 'notificationEmail-text'],
-                ['user' => $user,'text'=> $text, 'title'=> $title]                 
+                ['user' => $user,'text'=> $text, 'title'=> $title]
                 )
             ->setFrom([Yii::$app->setting->getValue('email::address') => Yii::$app->setting->getValue('email::displayname')])
             ->setTo($user->email)
             ->setSubject('Notification ' .  Yii::$app->setting->getValue('app::title'))
             ->send();
-             
+
     }
 }
