@@ -11,7 +11,7 @@ use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var portalium\notification\models\Notification $model */
-/** @var yii\widgets\ActiveForm $form */
+/** @var yii\widgets\ActiveForm $notificationForm */
 ?>
 
 
@@ -22,17 +22,17 @@ use yii\helpers\Url;
         'header' => [
         ],
         'footer' => [
-            Html::submitButton(Module::t( 'Save'), ['class' => 'btn btn-success']),
+            Html::submitButton(Module::t('Save'), ['class' => 'btn btn-success']),
         ]
     ],
 ]) ?>
 
 
- 
+
 <?php
 
 
-echo $form->field($notificationForm, 'notificationType', ['options' => ['id' => 'module-list-div']])->dropDownList(Notification::getNotificationType(), ['id' => 'module-list', 'prompt' => 'Select Notification']);
+echo $form->field($notificationForm, 'notificationType', ['options' => ['id' => 'module-list-div']])->dropDownList(Notification::getNotificationType(), ['id' => 'module-list', 'prompt' => Module::t('Select Notification Type')]);
 
 
 echo $form->field($notificationForm, 'receiver_id', ['options' => ['id' => 'recipients-list-div']])->widget(DepDrop::classname(), [
@@ -46,11 +46,14 @@ echo $form->field($notificationForm, 'receiver_id', ['options' => ['id' => 'reci
         'paramsBase' => [
             Yii::$app->request->csrfParam => Yii::$app->request->csrfToken,
         ]
-    ] 
+    ]
 ]);
-?> 
+?>
 <?= $form->field($notificationForm, 'title')->textInput(['maxlength' => true]) ?>
 <?= $form->field($notificationForm, 'text')->textInput(['maxlength' => true]) ?>
+<?php if ($this->context->action->id === 'create'): ?>
+<?= $form->field($notificationForm, 'send_email')->checkbox(['label' => Module::t('Send as Email')]) ?>
+<?php endif; ?>
 
 <?php Panel::end() ?>
 <?php ActiveForm::end(); ?>

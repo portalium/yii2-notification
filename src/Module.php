@@ -9,11 +9,14 @@ class Module extends \portalium\base\Module
             'class' => 'yii\rest\UrlRule',
             'controller' => [
                 'notification/default',
-            ]
+                'notification/device',
+            ],
+            'pluralize' => false
         ],
     ];
     
 	public static $tablePrefix = 'notification_';
+    public static $name = 'notification';
     public static function moduleInit()
     {
         self::registerTranslation('notification','@portalium/notification/messages',[

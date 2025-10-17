@@ -17,28 +17,33 @@ class m220219_222513_notification_rule_rbac extends Migration
             'notificationWebDefaultIndexOwn',
             'notificationWebDefaultViewOwn',
             'notificationWebDefaultDeleteOwn',
-            'notificationWebDefaultUpdateOwn'
+            'notificationWebDefaultUpdateOwn',
         ];
 
         foreach ($permissionsName as $permissionName)
         {
             $permission = $auth->createPermission($permissionName);
             $permission->description = $permissionName;
+
             if($permissionName!=='notificationWebDefaultIndexOwn'){
                 $permission->ruleName = $rule->name;
-            }
-            $auth->add($permission);
-            $auth->addChild($admin, $permission);
+                $auth->add($permission);
+                $auth->addChild($admin, $permission);
+
             $childPermission = $auth->getPermission(str_replace('Own', '', $permissionName));
             $auth->addChild($permission, $childPermission);
-
+            }
+            else{
+                $auth->add($permission);
+                $auth->addChild($admin, $permission);
+            }
         }
     }
 
     public function down()
     {
         $auth = Yii::$app->authManager;
-
+        $auth->removeChild($auth->getPermission('notificationWebDefaultIndexOwn'), $auth->getPermission('notificationWebDefaultIndex'));
         $auth->remove($auth->getPermission('notificationWebDefaultIndexOwn'));
         $auth->remove($auth->getPermission('notificationWebDefaultViewOwn'));
         $auth->remove($auth->getPermission('notificationWebDefaultDeleteOwn'));
