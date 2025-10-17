@@ -105,7 +105,7 @@ class DefaultController extends Controller
                     }
                 }
             }
-                return $this->redirect(['index']);
+            return $this->redirect(['index']);
         } else {
             $model->loadDefaultValues();
         }
@@ -125,13 +125,11 @@ class DefaultController extends Controller
         $notificationForm->text = $model->text;
         $notificationForm->title = $model->title;
 
-        if ($notificationForm->load($this->request->post()))
-        {
+        if ($notificationForm->load($this->request->post())) {
             $model->title = $notificationForm->title;
             $model->text = $notificationForm->text;
 
-            if ($model->save())
-            {
+            if ($model->save()) {
                 Yii::$app->session->addFlash('success', Module::t('Notification has been updated'));
                 return $this->redirect(['view', 'id' => $model->id_notification]);
             }
@@ -210,5 +208,31 @@ class DefaultController extends Controller
                 return json_encode(['output' => $out, 'selected' => '']);
             }
         }
+    }
+
+    public function actionResend()
+    {
+        if (!\Yii::$app->user->can('notificationWebDefaultResend')) {
+            throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
+        }
+
+        $notificationId = \Yii::$app->request->post('id_notification');
+        $channels = \Yii::$app->request->post('channels', []);
+
+        if ($notificationId && !empty($channels)) {
+            $notification = Notification::findModel($notificationId);
+            // Logic to resend the notification
+            if (in_array('email', $channels)) {
+                $userEmail = User::findOne($notification->id_to);
+                Yii::$app->notification->sendEmail($userEmail, $notification->text, $notification->title);
+            }
+
+            if (in_array('push', $channels)) {
+                Yii::$app->notification->sendPushToUserByNotification($notification);
+            }
+        }
+        Yii::warning("Resend action called for notification ID: " . $notificationId . " via channels: " . implode(", ", $channels));
+
+        return $this->redirect(['index']);
     }
 }

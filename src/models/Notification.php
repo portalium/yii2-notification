@@ -13,8 +13,17 @@ use portalium\user\models\Group;
 use portalium\user\models\UserGroup;
 use yii\web\NotFoundHttpException;
 
-
-
+/**
+ * This is the model class for table "notification".
+ *
+ * @property int $id_notification
+ * @property int $id_to
+ * @property string $text
+ * @property string $title
+ * @property int $status
+ *
+ * @property User $to
+ */
 
 class Notification extends \yii\db\ActiveRecord
 {

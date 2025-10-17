@@ -48,6 +48,11 @@ class m220219_222513_notification_rbac
         $notificationWebDefaultDeleteAll->description = 'Notification Web Default Delete All';
         $auth->add($notificationWebDefaultDeleteAll);
         $auth->addChild($admin, $notificationWebDefaultDeleteAll);
+        
+        $notificationWebDefaultResend = $auth->createPermission('notificationWebDefaultResend');
+        $notificationWebDefaultResend->description = 'Notification Web Default Delete All';
+        $auth->add($notificationWebDefaultResend);
+        $auth->addChild($admin, $notificationWebDefaultResend);
 
     }
 
@@ -63,5 +68,6 @@ class m220219_222513_notification_rbac
         $auth->remove($auth->getPermission('notificationWebDefaultRead'));
         $auth->remove($auth->getPermission('notificationWebDefaultTypeShow'));
         $auth->remove($auth->getPermission('notificationWebDefaultDeleteAll'));
+        $auth->remove($auth->getPermission('notificationWebDefaultResend'));
     }
 }
