@@ -22,6 +22,12 @@
 	"support" : {
 		"issues" : "https://github.com/portalium/yii2-notification/issues"
 	},
+	"require": {
+		"portalium/yii2-site": "*",
+		"portalium/yii2-user": "*",
+		"portalium/yii2-menu": "*",
+		"portalium/yii2-workspace": "*"
+	},
 	"autoload" : {
 		"psr-4" : {
 			"portalium\\notification\\" : "src/"
