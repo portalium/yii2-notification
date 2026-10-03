@@ -6,6 +6,7 @@ use yii\base\Component;
 use portalium\notification\models\Notification as NotificationModel;
 use portalium\notification\models\NotificationDevice;
 use portalium\user\models\User;
+use portalium\workspace\models\WorkspaceUser;
 use Yii;
 
 class Notification extends Component
@@ -305,9 +306,23 @@ class Notification extends Component
     }
 
     /**
-     * Workspace'deki tüm kullanıcılara push notification gönder
+     * Workspace cihazlarına push gönderir; isteğe bağlı olarak modül ve role göre alıcıları sınırlar.
+     *
+     * Kullanım: sendPushToWorkspace($workspaceId, $title, $message, [], null,
+     *     ['printer' => ['yazici_manager', 'yazici_editor']]);
+     *
+     * @param int|string $workspaceId Bildirim gönderilecek workspace kimliği.
+     * @param string $title Push bildiriminin başlığı.
+     * @param string $message Push bildiriminin metni.
+     * @param array $data Push bildirimiyle cihaza iletilecek ek veri.
+     * @param string|null $deviceType Verilirse yalnızca bu türdeki cihazları seçer.
+     * @param array<string, string[]> $filterRoles Modül kimliğini rol adları listesine eşleyen alıcı filtresi.
+     *        Eşleşme OR mantığıyladır: kullanıcı herhangi bir modül altında listelenen rollerden
+     *        herhangi birine sahipse seçilir.
+     * @return array Gönderim durumu, filtreleri geçen cihaz sayısı ve gönderim sonuçları.
+     * @throws \InvalidArgumentException filterRoles beklenen modül => rol listesi biçiminde değilse.
      */
-    public function sendPushToWorkspace($workspaceId, $title, $message, $data = [], $deviceType = null)
+    public function sendPushToWorkspace($workspaceId, $title, $message, $data = [], $deviceType = null, array $filterRoles = []): array
     {
         // Workspace'deki aktif cihazları al
         $devices = NotificationDevice::find()
@@ -323,11 +338,53 @@ class Notification extends Component
             return ['success' => false, 'error' => 'No active devices found for workspace'];
         }
 
+        $roleConditions = ['or'];
+        $eligibleUserIds = [];
+
+        if (!empty($filterRoles))
+        {
+            foreach ($filterRoles as $module => $roles)
+            {
+                if (!is_string($module) || $module === '' || !is_array($roles) || empty($roles)) {
+                    throw new \InvalidArgumentException(
+                        'Each filterRoles entry must contain a module name and a non-empty array of role names.'
+                    );
+                }
+
+                foreach ($roles as $role) {
+                    if (!is_string($role) || $role === '') {
+                        throw new \InvalidArgumentException('Role names in filterRoles must be non-empty strings.');
+                    }
+                }
+
+                $roleConditions[] = [
+                    'and',
+                    ['id_module' => $module],
+                    ['role' => array_values(array_unique($roles))],
+                ];
+            }
+            
+            $eligibleUserIds = WorkspaceUser::find()
+                ->where(['id_workspace' => $workspaceId])
+                ->andWhere($roleConditions)
+                ->select('id_user')
+                ->distinct()
+                ->column();
+            $eligibleUserIds = array_fill_keys(array_map('intval', $eligibleUserIds), true);
+        }
+
         $results = [];
         $successCount = 0;
         $failCount = 0;
+        $eligibleDeviceCount = 0;
 
         foreach ($devices as $device) {
+            if (!empty($filterRoles) &&
+                !isset($eligibleUserIds[(int) $device->id_user])) {
+                continue;
+            }
+
+            $eligibleDeviceCount++;
             $result = $this->sendPushNotification($device->device_token, $title, $message, $data);
             $results[] = [
                 'user_id' => $device->id_user,
@@ -345,7 +402,7 @@ class Notification extends Component
         return [
             'success' => $successCount > 0,
             'summary' => [
-                'total_devices' => count($devices),
+                'total_devices' => $eligibleDeviceCount,
                 'success_count' => $successCount,
                 'fail_count' => $failCount
             ],
