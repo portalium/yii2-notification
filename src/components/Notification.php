@@ -11,6 +11,18 @@ use Yii;
 class Notification extends Component
 {
 
+    /** FCM disa donuk cagrilarinda baglanti ve toplam sure siniri (saniye). */
+    const CURL_CONNECT_TIMEOUT = 3;
+    const CURL_TIMEOUT = 5;
+
+    /** OAuth2 access token onbellegi; token omru 3600 sn oldugundan pay birakilir. */
+    const ACCESS_TOKEN_CACHE_KEY = 'portalium.notification.fcm.access_token';
+    const ACCESS_TOKEN_CACHE_TTL = 3300;
+
+    /** Sunucu saati ile gercek UTC arasindaki sapma onbellegi. */
+    const CLOCK_OFFSET_CACHE_KEY = 'portalium.notification.fcm.clock_offset';
+    const CLOCK_OFFSET_CACHE_TTL = 3600;
+
     public function addNotification($id_to, $title, $text)
     { 
         if($id_to == null || User::findOne($id_to) == null)
@@ -41,39 +53,29 @@ class Notification extends Component
 
     public function sendPushNotification($deviceToken, $title, $message, $data = [], $priority = null, $sound = null)
     {
-        // FCM'nin etkin olup olmadığını kontrol et
-        if (!Yii::$app->setting->getValue('notification::fcm_enabled')) {
-            return ['success' => false, 'error' => 'FCM is disabled'];
-        }
-
-        // Gerekli ayarları al
-        $projectId = Yii::$app->setting->getValue('notification::fcm_project_id');
-        $serviceAccount = Yii::$app->setting->getValue('notification::fcm_service_account_json');
-        $apiUrlTemplate = Yii::$app->setting->getValue('notification::fcm_api_url');
-
-        if (empty($projectId)) {
-            return ['success' => false, 'error' => 'FCM project ID not configured'];
-        }
-        
         if (empty($deviceToken)) {
             return ['success' => false, 'error' => 'Device token is required'];
         }
 
-        // API URL'ini oluştur
-        $apiUrl = str_replace('{project_id}', $projectId, $apiUrlTemplate);
+        $results = $this->sendPushToTokens([$deviceToken], $title, $message, $data, $priority, $sound);
 
-        // Access token al
-        $accessToken = $this->getAccessToken($serviceAccount);
-        if (!$accessToken) {
-            Yii::error("Unable to get access token for FCM", __METHOD__);
-            return ['success' => false, 'error' => 'Unable to get access token'];
+        // Ayar/token eksikligi tek bir hata dizisi dondurur.
+        if (isset($results['error'])) {
+            return $results['error'];
         }
 
-        // Default değerler setting'lerden al
+        return $results[0];
+    }
+
+    /**
+     * Tek bir cihaz icin FCM v1 mesaj govdesini kurar.
+     */
+    private function buildFcmPayload($deviceToken, $title, $message, $data = [], $priority = null, $sound = null)
+    {
         if ($priority === null) {
             $priority = Yii::$app->setting->getValue('notification::fcm_default_priority') ?: 'high';
         }
-        
+
         if ($sound === null) {
             $sound = Yii::$app->setting->getValue('notification::fcm_default_sound') ?: 'default';
         }
@@ -81,7 +83,6 @@ class Notification extends Component
         $notificationIcon = Yii::$app->setting->getValue('notification::fcm_icon') ?: 'ic_notification';
         $notificationColor = Yii::$app->setting->getValue('notification::fcm_color') ?: '#FF6600';
 
-        // FCM v1 mesaj yapısını oluştur
         $messagePayload = [
             'message' => [
                 'token' => $deviceToken,
@@ -111,57 +112,177 @@ class Notification extends Component
             ]
         ];
 
-        // Ek veri varsa ekle
+        // Ek veri varsa ekle - FCM data degerlerinin tumu string olmali
         if (!empty($data)) {
-            $messagePayload['message']['data'] = $data;
+            $messagePayload['message']['data'] = array_map('strval', $data);
         }
 
-        // HTTP başlıklarını hazırla
+        return $messagePayload;
+    }
+
+    /**
+     * Hazirlanmis FCM mesajlarini curl_multi ile es zamanli gonderir.
+     *
+     * Cihazlar tek tek, ardisik olarak gonderildiginde her cihazin gecikmesi
+     * toplama ekleniyordu; burada tum istekler ayni anda ucusa gecer, boylece
+     * toplam sure en yavas cihazin suresi kadar olur.
+     *
+     * @param array $requests [['key' => <sonuc anahtari>, 'payload' => <mesaj dizisi>], ...]
+     * @return array key => sonuc dizisi
+     */
+    private function executeFcmRequests($apiUrl, $accessToken, array $requests)
+    {
         $headers = [
             'Authorization: Bearer ' . $accessToken,
             'Content-Type: application/json',
         ];
-        Yii::warning("Sending FCM push notification: " . json_encode($messagePayload), __METHOD__);
-        // cURL ile FCM v1 API'sine istek gönder
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $apiUrl);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($messagePayload));
 
-        $result = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
+        $multi   = curl_multi_init();
+        $handles = [];
 
-        // Hata kontrolü
-        if ($error) {
-            Yii::warning("cURL Error: " . $error, __METHOD__);
-            return ['success' => false, 'error' => 'cURL Error: ' . $error];
+        foreach ($requests as $request) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $apiUrl);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::CURL_CONNECT_TIMEOUT);
+            curl_setopt($ch, CURLOPT_TIMEOUT, self::CURL_TIMEOUT);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request['payload']));
+
+            curl_multi_add_handle($multi, $ch);
+            $handles[] = ['key' => $request['key'], 'ch' => $ch];
         }
 
-        // Yanıtı çözümle
-        $response = json_decode($result, true);
-        
-        if ($httpCode === 200 && isset($response['name'])) {
-            Yii::info("Push notification sent successfully: " . json_encode($response), __METHOD__);
-            return [
-                'success' => true,
-                'message' => 'Push notification sent successfully',
-                'response' => $response
-            ];
-        } else {
-            Yii::warning("FCM v1 API Error: HTTP $httpCode - " . json_encode($response), __METHOD__);
-            return [
-                'success' => false,
-                'error' => 'FCM v1 API Error',
-                'http_code' => $httpCode,
-                'response' => $response
+        do {
+            $status = curl_multi_exec($multi, $running);
+            if ($running) {
+                curl_multi_select($multi, 1.0);
+            }
+        } while ($running && $status === CURLM_OK);
+
+        // curl_multi'de handle basina hata kodu curl_errno ile degil, info_read
+        // kuyrugundan okunur; once hepsini handle'a gore toplariz.
+        $errors = [];
+        while ($info = curl_multi_info_read($multi)) {
+            $errors[$this->handleKey($info['handle'])] = $info['result'];
+        }
+
+        $results = [];
+
+        foreach ($handles as $handle) {
+            $ch    = $handle['ch'];
+            $body  = curl_multi_getcontent($ch);
+            $code  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            $errno = $errors[$this->handleKey($ch)] ?? curl_errno($ch);
+
+            curl_multi_remove_handle($multi, $ch);
+            curl_close($ch);
+
+            // Zaman asimi, olu/yavas token'larda en sik gorulen hata; ayrica isaretlenir
+            // ki sorun teshisinde genel bir "FCM API Error"a karismasin.
+            if ($errno === CURLE_OPERATION_TIMEDOUT) {
+                Yii::warning('FCM request timed out after ' . self::CURL_TIMEOUT . 's', __METHOD__);
+                $results[$handle['key']] = [
+                    'success'   => false,
+                    'error'     => 'FCM request timed out',
+                    'timed_out' => true,
+                ];
+                continue;
+            }
+
+            if ($error) {
+                $results[$handle['key']] = ['success' => false, 'error' => 'cURL Error: ' . $error];
+                continue;
+            }
+
+            $response = json_decode($body, true);
+
+            if ($code === 200 && isset($response['name'])) {
+                $results[$handle['key']] = [
+                    'success'  => true,
+                    'message'  => 'Push notification sent successfully',
+                    'response' => $response
+                ];
+            } else {
+                $results[$handle['key']] = [
+                    'success'   => false,
+                    'error'     => 'FCM v1 API Error',
+                    'http_code' => $code,
+                    'response'  => $response
+                ];
+            }
+        }
+
+        curl_multi_close($multi);
+
+        return $results;
+    }
+
+    /**
+     * Bir curl handle'ini dizi anahtari olarak kullanilabilir hale getirir.
+     * PHP 8'de handle bir CurlHandle nesnesi, oncesinde resource'tur.
+     */
+    private function handleKey($handle)
+    {
+        return is_object($handle) ? spl_object_id($handle) : (int) $handle;
+    }
+
+    /**
+     * Birden cok cihaz token'ina ayni bildirimi es zamanli gonderir.
+     *
+     * FCM ayarlari ve access token bir kez cozulur, istekler curl_multi ile
+     * paralel akar. Donen dizi token sirasini korur.
+     *
+     * @return array Ayar/token eksikse ['error' => <hata dizisi>], aksi halde token sirasina gore sonuclar
+     */
+    private function sendPushToTokens(array $deviceTokens, $title, $message, $data = [], $priority = null, $sound = null)
+    {
+        if (!Yii::$app->setting->getValue('notification::fcm_enabled')) {
+            return ['error' => ['success' => false, 'error' => 'FCM is disabled']];
+        }
+
+        $projectId      = Yii::$app->setting->getValue('notification::fcm_project_id');
+        $serviceAccount = Yii::$app->setting->getValue('notification::fcm_service_account_json');
+        $apiUrlTemplate = Yii::$app->setting->getValue('notification::fcm_api_url');
+
+        if (empty($projectId)) {
+            return ['error' => ['success' => false, 'error' => 'FCM project ID not configured']];
+        }
+
+        $apiUrl = str_replace('{project_id}', $projectId, $apiUrlTemplate);
+
+        $accessToken = $this->getAccessToken($serviceAccount);
+        if (!$accessToken) {
+            Yii::error("Unable to get access token for FCM", __METHOD__);
+            return ['error' => ['success' => false, 'error' => 'Unable to get access token']];
+        }
+
+        $requests = [];
+        $results  = [];
+
+        foreach ($deviceTokens as $index => $deviceToken) {
+            if (empty($deviceToken)) {
+                $results[$index] = ['success' => false, 'error' => 'Device token is required'];
+                continue;
+            }
+
+            $requests[] = [
+                'key'     => $index,
+                'payload' => $this->buildFcmPayload($deviceToken, $title, $message, $data, $priority, $sound),
             ];
         }
+
+        if (!empty($requests)) {
+            $results += $this->executeFcmRequests($apiUrl, $accessToken, $requests);
+        }
+
+        ksort($results);
+
+        return $results;
     }
 
     /**
@@ -169,15 +290,42 @@ class Notification extends Component
      */
     private function getAccessToken($serviceAccount)
     {
-        try {
-            // Service account JSON dosyasını oku
-            if (!$serviceAccount || !isset($serviceAccount['private_key'], $serviceAccount['client_email'])) {
-                Yii::error("Invalid service account JSON", __METHOD__);
-                return null;
-            }
+        if (!$serviceAccount || !isset($serviceAccount['private_key'], $serviceAccount['client_email'])) {
+            Yii::error("[FCM] Invalid service account JSON. Keys: " . (is_array($serviceAccount) ? implode(',', array_keys($serviceAccount)) : 'N/A (not array)'), __METHOD__);
+            return null;
+        }
 
-            // JWT oluştur
-            $now = time();
+        // Token 3600 sn gecerli; her bildirimde yeniden almak yerine onbellekten okunur.
+        // Anahtar client_email'e baglidir, boylece service account degisince onbellek dogal olarak tazelenir.
+        $cache = Yii::$app->has('cache') ? Yii::$app->cache : null;
+        $cacheKey = self::ACCESS_TOKEN_CACHE_KEY . '.' . md5($serviceAccount['client_email']);
+
+        if ($cache !== null) {
+            $cached = $cache->get($cacheKey);
+            if (!empty($cached)) {
+                return $cached;
+            }
+        }
+
+        $token = $this->fetchAccessToken($serviceAccount);
+
+        if ($token !== null && $cache !== null) {
+            $cache->set($cacheKey, $token, self::ACCESS_TOKEN_CACHE_TTL);
+        }
+
+        return $token;
+    }
+
+    /**
+     * Google OAuth2'den yeni bir access token alir (onbellek atlanarak).
+     */
+    private function fetchAccessToken($serviceAccount)
+    {
+        try {
+//            Yii::warning("[FCM DEBUG] client_email=" . $serviceAccount['client_email'] . " | private_key starts=" . substr($serviceAccount['private_key'], 0, 40) . " | private_key ends=" . substr($serviceAccount['private_key'], -20) . " | has_newlines=" . (strpos($serviceAccount['private_key'], "\n") !== false ? 'yes' : 'NO - PROBLEM!'), __METHOD__);
+
+            // JWT oluştur — sunucu saati hatalıysa Google'dan gerçek UTC zamanını al
+            $now = $this->getGoogleUtcTime();
             $header = [
                 'alg' => 'RS256',
                 'typ' => 'JWT'
@@ -195,12 +343,20 @@ class Notification extends Component
             $payloadEncoded = $this->base64UrlEncode(json_encode($payload));
 
             $signature = '';
-            openssl_sign(
+            $privateKey = $serviceAccount['private_key'];
+            
+            $privateKey = str_replace('\\n', "\n", $privateKey);
+            
+            $signResult = openssl_sign(
                 $headerEncoded . '.' . $payloadEncoded,
                 $signature,
-                $serviceAccount['private_key'],
+                $privateKey,
                 'sha256WithRSAEncryption'
             );
+//            Yii::warning("Sunucu saati: " . date('Y-m-d H:i:s') . "\n");
+//            Yii::warning("Unix timestamp: " . time() . "\n");
+//            Yii::warning("Timezone: " . date_default_timezone_get() . "\n");
+//            Yii::warning("[FCM DEBUG] openssl_sign result=" . ($signResult ? 'SUCCESS' : 'FAILED') . " | openssl_error=" . openssl_error_string() . " | signature_length=" . strlen($signature), __METHOD__);
 
             $jwt = $headerEncoded . '.' . $payloadEncoded . '.' . $this->base64UrlEncode($signature);
 
@@ -214,14 +370,18 @@ class Notification extends Component
             ]));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::CURL_CONNECT_TIMEOUT);
+            curl_setopt($ch, CURLOPT_TIMEOUT, self::CURL_TIMEOUT);
 
             $result = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
+//            Yii::warning("[FCM DEBUG] OAuth2 response httpCode=" . $httpCode . " | body=" . $result, __METHOD__);
+
             if ($httpCode === 200) {
                 $response = json_decode($result, true);
-                Yii::warning("Access token obtained: " . $response['access_token'], __METHOD__);
+//                Yii::warning("Access token obtained: " . $response['access_token'], __METHOD__);
                 return $response['access_token'] ?? null;
             }
 
@@ -231,6 +391,56 @@ class Notification extends Component
             Yii::error("Access token error: " . $e->getMessage(), __METHOD__);
             return null;
         }
+    }
+
+    /**
+     * Sunucu saati yanlışsa Google'ın HTTP Date header'ından gerçek UTC zamanını döndürür.
+     * Başarısız olursa time()'a düşer.
+     */
+    private function getGoogleUtcTime(): int
+    {
+        static $offset = null;
+
+        if ($offset !== null) {
+            return time() + $offset;
+        }
+
+        $cache = Yii::$app->has('cache') ? Yii::$app->cache : null;
+        if ($cache !== null) {
+            $cached = $cache->get(self::CLOCK_OFFSET_CACHE_KEY);
+            if ($cached !== false) {
+                $offset = (int) $cached;
+                return time() + $offset;
+            }
+        }
+
+        $offset = 0;
+
+        try {
+            $ch = curl_init('https://www.googleapis.com/');
+            curl_setopt($ch, CURLOPT_NOBODY, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::CURL_CONNECT_TIMEOUT);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+            $response = curl_exec($ch);
+            curl_close($ch);
+
+            if ($response && preg_match('/Date:\s*(.+)\r?\n/i', $response, $m)) {
+                $ts = strtotime(trim($m[1]));
+                if ($ts !== false && abs($ts - time()) < 86400) {
+                    $offset = $ts - time();
+                }
+            }
+        } catch (\Throwable $e) {
+            // sessizce dus, sapma 0 kalir
+        }
+
+        if ($cache !== null) {
+            $cache->set(self::CLOCK_OFFSET_CACHE_KEY, $offset, self::CLOCK_OFFSET_CACHE_TTL);
+        }
+
+        return time() + $offset;
     }
 
     /**
@@ -258,6 +468,7 @@ class Notification extends Component
         $deviceTokens = NotificationDevice::getActiveTokensByUser($userId, $workspaceId, $deviceType);
         
         if (empty($deviceTokens)) {
+//            Yii::warning("No active devices found for user $userId in workspace $workspaceId with device type $deviceType", __METHOD__);
             return ['success' => false, 'error' => 'No active devices found for user'];
         }
 
@@ -265,20 +476,29 @@ class Notification extends Component
         $successCount = 0;
         $failCount = 0;
 
-        foreach ($deviceTokens as $deviceToken) {
-            $result = $this->sendPushNotification($deviceToken, $title, $message, $data);
+        $sendResults = $this->sendPushToTokens($deviceTokens, $title, $message, $data);
+
+        if (isset($sendResults['error'])) {
+            return $sendResults['error'];
+        }
+
+        foreach ($deviceTokens as $index => $deviceToken) {
+            $result = $sendResults[$index];
             $results[] = [
                 'device_token' => substr($deviceToken, 0, 20) . '...', // Güvenlik için kısa göster
                 'result' => $result
             ];
-            
+
             if ($result['success']) {
                 $successCount++;
             } else {
                 $failCount++;
             }
         }
-
+//        Yii::warning(
+//            "sendPushToUser results for user $userId: success=$successCount, fail=$failCount, total=" . count($deviceTokens),
+//            __METHOD__
+//        );
         return [
             'success' => $successCount > 0,
             'summary' => [
@@ -327,14 +547,24 @@ class Notification extends Component
         $successCount = 0;
         $failCount = 0;
 
-        foreach ($devices as $device) {
-            $result = $this->sendPushNotification($device->device_token, $title, $message, $data);
+        $tokens = array_map(function ($device) {
+            return $device->device_token;
+        }, $devices);
+
+        $sendResults = $this->sendPushToTokens($tokens, $title, $message, $data);
+
+        if (isset($sendResults['error'])) {
+            return $sendResults['error'];
+        }
+
+        foreach ($devices as $index => $device) {
+            $result = $sendResults[$index];
             $results[] = [
                 'user_id' => $device->id_user,
                 'device_type' => $device->device_type,
                 'result' => $result
             ];
-            
+
             if ($result['success']) {
                 $successCount++;
             } else {
@@ -383,14 +613,24 @@ class Notification extends Component
         $successCount = 0;
         $failCount = 0;
 
-        foreach ($devices as $device) {
-            $result = $this->sendPushNotification($device->device_token, $title, $message, $data);
+        $tokens = array_map(function ($device) {
+            return $device->device_token;
+        }, $devices);
+
+        $sendResults = $this->sendPushToTokens($tokens, $title, $message, $data);
+
+        if (isset($sendResults['error'])) {
+            return $sendResults['error'];
+        }
+
+        foreach ($devices as $index => $device) {
+            $result = $sendResults[$index];
             $results[] = [
                 'user_id' => $device->id_user,
                 'device_type' => $device->device_type,
                 'result' => $result
             ];
-            
+
             if ($result['success']) {
                 $successCount++;
             } else {
