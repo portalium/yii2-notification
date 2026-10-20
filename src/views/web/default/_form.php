@@ -5,13 +5,10 @@ use portalium\theme\widgets\ActiveForm;
 use portalium\theme\widgets\Panel;
 use portalium\notification\Module;
 use portalium\notification\models\Notification;
-use portalium\notification\models\NotificationForm;
-use kartik\depdrop\DepDrop;
-use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var portalium\notification\models\Notification $model */
-/** @var yii\widgets\ActiveForm $notificationForm */
+/** @var yii\widgets\ActiveForm $form */
 ?>
 
 
@@ -26,44 +23,10 @@ use yii\helpers\Url;
         ]
     ],
 ]) ?>
+<?= $form->field($model, 'id_to')->dropDownList(Notification::getUserList())->label('User') ?>
+<?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+<?= $form->field($model, 'text')->textInput(['maxlength' => true]) ?>
 
-
-
-<?php
-
-
-echo $form->field($notificationForm, 'notificationType', ['options' => ['id' => 'module-list-div']])->dropDownList(Notification::getNotificationType(), ['id' => 'module-list', 'prompt' => Module::t('Select Notification Type')]);
-
-
-echo $form->field($notificationForm, 'receiver_id', ['options' => ['id' => 'recipients-list-div']])->widget(DepDrop::classname(), [
-    'options' => ['id' => 'recipients-list',
-        'multiple' =>true],
-    'type' => DepDrop::TYPE_SELECT2,
-    'pluginOptions' => [
-        'depends' => ['module-list'],
-        'placeholder' => Module::t('Select...'),
-        'url' => Url::to(['/notification/default/show-notification-type']),
-        'paramsBase' => [
-            Yii::$app->request->csrfParam => Yii::$app->request->csrfToken,
-        ]
-    ]
-]);
-?>
-<?= $form->field($notificationForm, 'title')->textInput(['maxlength' => true]) ?>
-<?= $form->field($notificationForm, 'text')->textInput(['maxlength' => true]) ?>
-<?php if ($this->context->action->id === 'create'): ?>
-<?= $form->field($notificationForm, 'send_email')->checkbox(['label' => Module::t('Send as Email')]) ?>
-<?php endif; ?>
 
 <?php Panel::end() ?>
 <?php ActiveForm::end(); ?>
-
-<?php
-$this->registerJs('
-    $(document).ajaxSend(function(event, jqxhr, settings) {
-        if (settings.type == "POST") {
-            settings.data = settings.data + "&' . Yii::$app->request->csrfParam . '=' . Yii::$app->request->csrfToken . '";
-        }
-    });
-');
-?>
