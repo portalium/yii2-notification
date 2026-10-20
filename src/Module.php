@@ -4,22 +4,21 @@ namespace portalium\notification;
 
 class Module extends \portalium\base\Module
 {
+    public static $name = 'notification';
+
     public $apiRules = [
         [
             'class' => 'yii\rest\UrlRule',
             'controller' => [
                 'notification/default',
-                'notification/device',
-            ],
-            'pluralize' => false
+            ]
         ],
     ];
-    
-	public static $tablePrefix = 'notification_';
-    public static $name = 'notification';
+
+    public static $tablePrefix = 'notification_';
     public static function moduleInit()
     {
-        self::registerTranslation('notification','@portalium/notification/messages',[
+        self::registerTranslation('notification', '@portalium/notification/messages', [
             'notification' => 'notification.php',
         ]);
     }
@@ -38,7 +37,8 @@ class Module extends \portalium\base\Module
         ];
     }
 
-    public function getMenuItems(){
+    public function getMenuItems()
+    {
         $menuItems = [
             [
                 [
