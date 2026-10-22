@@ -1,6 +1,8 @@
 <?php
 
-class m220219_222513_notification_rbac
+use yii\db\Migration;
+
+class m220219_222513_notification_rbac extends Migration
 {
     public function up(){
 
