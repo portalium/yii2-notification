@@ -46,6 +46,8 @@ class SmsSender extends Component
                 return $this->sendWithNetgsm($to, $message, $config);
             case 'verimor':
                 return $this->sendWithVerimor($to, $message, $config);
+            default:
+                return $this->failure(null, 'unsupported_provider');
         }
     }
 
