@@ -26,7 +26,7 @@ class SmsSender extends Component
      * @param array $config Credentials and sender configuration for the selected provider.
      * @return array A result with success, provider, status, retryable and, on success, message_id.
      */
-    public function send($provider, $to, $message, array $config)
+    public function send($provider, $to, $message, array $config, $type = 'informational')
     {
         $provider = is_string($provider) ? strtolower(trim($provider)) : '';
         if (!in_array($provider, ['netgsm', 'verimor'], true)) {
@@ -37,15 +37,19 @@ class SmsSender extends Component
             return $this->failure($provider, 'invalid_phone_number');
         }
 
+        if (!in_array($type, ['otp', 'informational'], true)) {
+            return $this->failure($provider, 'unsupported_message_type, accepted types: otp, informational');
+        }
+
         if (!is_string($message) || trim($message) === '') {
             return $this->failure($provider, 'message_required');
         }
 
         switch ($provider) {
             case 'netgsm':
-                return $this->sendWithNetgsm($to, $message, $config);
+                return $this->sendWithNetgsm($to, $message, $config, $type);
             case 'verimor':
-                return $this->sendWithVerimor($to, $message, $config);
+                return $this->sendWithVerimor($to, $message, $config, $type);
             default:
                 return $this->failure(null, 'unsupported_provider');
         }
@@ -198,7 +202,7 @@ class SmsSender extends Component
         return ['status' => 'unknown', 'retryable' => false];
     }
 
-    private function sendWithNetgsm($to, $message, array $config)
+    private function sendWithNetgsm($to, $message, array $config, $type)
     {
         foreach (['usercode', 'password', 'msgheader'] as $key) {
             if (!isset($config[$key]) || $config[$key] === '') {
@@ -243,7 +247,7 @@ class SmsSender extends Component
         return $this->classifyHttpFailure('netgsm', $response['http_code'], $body);
     }
 
-    private function sendWithVerimor($to, $message, array $config)
+    private function sendWithVerimor($to, $message, array $config, $type)
     {
         foreach (['username', 'password'] as $key) {
             if (!isset($config[$key]) || $config[$key] === '') {
