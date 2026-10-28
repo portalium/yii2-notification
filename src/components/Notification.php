@@ -51,6 +51,40 @@ class Notification extends Component
 
     }
 
+    public function sendSms($to, $message)
+    {
+        if (!Yii::$app->setting->getValue('notification::sms_enabled')) {
+            return [
+                'success' => false,
+                'provider' => null,
+                'status' => 'not_sent',
+                'retryable' => false,
+                'error' => 'sms_disabled',
+            ];
+        }
+
+        // Only the configured provider is used. Automatic failover is avoided
+        // because a lost response can leave the original delivery ambiguous.
+        $provider = Yii::$app->setting->getValue('notification::sms_provider');
+        $providerConfig = [];
+
+        if ($provider === 'netgsm') {
+            $providerConfig = [
+                'usercode' => Yii::$app->setting->getValue('notification::sms_netgsm_usercode'),
+                'password' => Yii::$app->setting->getValue('notification::sms_netgsm_password'),
+                'msgheader' => Yii::$app->setting->getValue('notification::sms_netgsm_msgheader'),
+            ];
+        } elseif ($provider === 'verimor') {
+            $providerConfig = [
+                'username' => Yii::$app->setting->getValue('notification::sms_verimor_username'),
+                'password' => Yii::$app->setting->getValue('notification::sms_verimor_password'),
+                'source_addr' => Yii::$app->setting->getValue('notification::sms_verimor_source_addr'),
+            ];
+        }
+
+        return (new SmsSender())->send($provider, $to, $message, $providerConfig);
+    }
+
     public function sendPushNotification($deviceToken, $title, $message, $data = [], $priority = null, $sound = null)
     {
         if (empty($deviceToken)) {
