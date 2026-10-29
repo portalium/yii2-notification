@@ -12,12 +12,14 @@ if (count($notifications) > 0) { ?>
 
     <ul class="card-box nav" id="notification">
         <li class="dropdown nav-item">
-            <a class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="#" style="padding-left: 0px !important; padding-right: 0px !important;">
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger marginleft--10px">
-                    <?= count($notifications) ?>
-                    <span class="visually-hidden">unread messages</span>
+            <a class="dropdown-toggle nav-link" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="#">
+                <span class="notification-bell">
+                    <i class="fa fa-bell"></i>
+                    <span class="badge rounded-pill bg-danger notification-count">
+                        <?= count($notifications) ?>
+                        <span class="visually-hidden">unread messages</span>
+                    </span>
                 </span>
-                <i class="fa fa-bell" style="padding-left: 20px; padding-right: 20px; margin-top: 3px; color: black !important;"></i>
             </a>
             <?php
             echo Html::beginTag('ul', $options);
@@ -53,8 +55,8 @@ if (count($notifications) > 0) { ?>
 <?php
 
 } else {
-    echo Html::beginTag('ul', ['class' => 'nav nav-link']);
-    echo Html::tag('i', '', ['class' => 'fa fa-bell-slash remove-after', 'style' => 'padding-left: 2px; padding-top:5px;']);
+    echo Html::beginTag('ul', ['class' => 'nav']);
+    echo Html::tag('li', Html::tag('span', Html::tag('i', '', ['class' => 'fa fa-bell-slash']), ['class' => 'nav-link pe-none']), ['class' => 'nav-item']);
     echo Html::endTag('ul');
 }
 ?>
@@ -75,7 +77,7 @@ $js = <<<JS
                     notificationCount.text(count - 1);
                     if (count - 1 === 0) {
                         notificationCount.remove();
-                        $('#notification').html('<i class="fa fa-bell-slash" style="padding-left: 20px; padding-right: 20px; margin-top: 10px;"></i>');
+                        $('#notification').html('<li class="nav-item"><span class="nav-link pe-none"><i class="fa fa-bell-slash"></i></span></li>');
                     }
                 }
             }

@@ -103,15 +103,17 @@
     padding-top: 6px;
 }
 
-#notification .position-absolute.top-0.start-100.translate-middle.badge {
-    margin-left: -16px;
+/* the count sits on the bell's top right corner */
+#notification .notification-bell {
+    position: relative;
+    display: inline-block;
 }
 
-#notification span {
-    top: 7px !important;
-}
-
-#notification .fa-bell {
-    padding-top: 7px;
+#notification .notification-count {
+    position: absolute;
+    top: -8px;
+    left: 100%;
+    transform: translateX(-50%);
+    padding: 2px 5px;
 }
 
