@@ -11,7 +11,18 @@ class Module extends \portalium\base\Module
             'class' => 'yii\rest\UrlRule',
             'controller' => [
                 'notification/default',
-            ]
+            ],
+            'pluralize' => false,
+            'extraPatterns' => [
+                'POST send' => 'send',
+            ],
+        ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => [
+                'notification/device',
+            ],
+            'pluralize' => false,
         ],
     ];
 

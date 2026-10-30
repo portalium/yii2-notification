@@ -17,4 +17,6 @@ return [
     'Text' => 'Metin',
     'Title' => 'Başlık',
     'Status' => 'Durum',
+    'All Users' => 'Tüm Kullanıcılar',
+    'No active users found for the selected receivers.' => 'Seçilen alıcılar arasında aktif kullanıcı bulunamadı.',
 ];

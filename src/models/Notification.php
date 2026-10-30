@@ -22,7 +22,8 @@ class Notification extends \yii\db\ActiveRecord
         return [
             [['id_to', 'text', 'title'], 'required'],
             [['id_to', 'status'], 'integer'],
-            [['text', 'title'], 'string'],
+            [['status'], 'in', 'range' => [self::STATUS_UNREAD, self::STATUS_READ]],
+            [['text', 'title'], 'string', 'max' => 255],
             [['id_to'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['id_to' => 'id_user']],
         ];
     }
