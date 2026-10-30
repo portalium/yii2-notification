@@ -2,7 +2,7 @@
 
 namespace portalium\notification\controllers\api;
 
-use portalium\developer\attributes as Doc;
+use portalium\openapi\attributes as Doc;
 use portalium\notification\Module;
 use portalium\notification\models\NotificationForm;
 use portalium\notification\models\NotificationSearch;
