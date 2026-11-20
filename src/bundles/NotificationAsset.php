@@ -17,7 +17,7 @@ class NotificationAsset extends AssetBundle
         'forceCopy' => YII_DEBUG,
     ];
 
-    public function init()
+    public function init(): void
     {
         parent::init();
     }
