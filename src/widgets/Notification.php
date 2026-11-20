@@ -33,24 +33,17 @@ class Notification extends Widget
         // {
         // $notifications = NotificationModel::getAllNotifications();
         // }
-        if (\Yii::$app->user->can('notificationWebDefaultIndexOwn'))
-            // {
-            $notifications = NotificationModel::getUnreadNotifications();
-        // }
-        else {
+        if (\Yii::$app->user->can('notificationWebDefaultIndexOwn')) {
+            $notifications = NotificationModel::getRecentNotifications();
+            $unread = NotificationModel::countUnread();
+        } else {
             $notifications = [];
+            $unread = 0;
         }
 
-        if (isset($this->options['class'])) {
-            $this->options['class'] .= ' dropdown-menu notify-drop';
-        } else {
-            $this->options['class'] = 'dropdown-menu notify-drop';
-        }
         return $this->render('notifications', [
             'notifications' => $notifications,
-            'options' => $this->options,
-            'label' => $this->generateLabel("Notification")
-
+            'unread' => $unread,
         ]);
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use portalium\notification\bundles\NotificationAsset;
 use portalium\notification\models\Notification;
 use portalium\notification\Module;
 use portalium\theme\widgets\ActionColumn;
@@ -13,6 +14,8 @@ use yii\helpers\Url;
 /** @var portalium\notification\models\NotificationSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
+NotificationAsset::register($this);
+
 $this->title = Module::t('Notifications');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -20,12 +23,14 @@ $this->params['breadcrumbs'][] = $this->title;
     'title' => Module::t('Notification'),
     'actions' => [
         'header' => [
-            Html::submitButton(Module::t(''), [
+            Html::button('', [
                 'class' => 'fa fa-trash btn btn-danger',
-                'id' => 'delete-select',
+                'id' => 'notification-delete-select',
+                'title' => Module::t('Delete selected'),
+                'aria-label' => Module::t('Delete selected'),
                 'data' => [
-                    'confirm' => Module::t('If you continue, all your data will be reset. Do you want to continue?'),
-                    'method' => 'post',
+                    'url' => Url::to(['delete-selected']),
+                    'confirm-text' => Module::t('Delete the selected notifications?'),
                 ],
             ]),
             Html::a(Module::t(''), ['create'], ['class' => 'fa fa-plus btn btn-success']),
@@ -37,6 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'columns' => [
+        ['class' => 'portalium\grid\CheckboxColumn'],
         ['class' => 'portalium\grid\SerialColumn'],
 
         'user.username',
