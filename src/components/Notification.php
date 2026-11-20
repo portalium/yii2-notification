@@ -11,7 +11,10 @@ use Yii;
 
 class Notification extends Component
 {
-    public function addNotification($id_to, $title, $text)
+    /**
+     * @param string|null $url where the notification leads (a path of this site, e.g. a task); opening the notification goes there
+     */
+    public function addNotification($id_to, $title, $text, $url = null)
     {
         if ($id_to == null || User::findOne($id_to) == null) {
             return;
@@ -21,10 +24,16 @@ class Notification extends Component
         $model->id_to = $id_to;
         $model->text = $text;
         $model->title = $title;
+        if ($url !== null && NotificationModel::isLocalUrl($url) && $model->hasAttribute('url')) {
+            $model->url = $url;
+        }
         $model->save();
     }
 
-    public function sendEmail($user, $text, $title)
+    /**
+     * @param string|null $subject the mail's subject; null keeps "Notification <app title>"
+     */
+    public function sendEmail($user, $text, $title, $subject = null)
     {
         Yii::$app->site->mailer->setViewPath(Yii::getAlias('@portalium/notification/mail'));
         return Yii::$app
@@ -36,7 +45,7 @@ class Notification extends Component
                 )
             ->setFrom([Yii::$app->setting->getValue('email::address') => Yii::$app->setting->getValue('email::displayname')])
             ->setTo($user->email)
-            ->setSubject('Notification ' .  Yii::$app->setting->getValue('app::title'))
+            ->setSubject($subject !== null && $subject !== '' ? $subject : 'Notification ' .  Yii::$app->setting->getValue('app::title'))
             ->send();
 
     }

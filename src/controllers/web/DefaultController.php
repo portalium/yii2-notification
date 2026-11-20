@@ -20,6 +20,10 @@ class DefaultController extends Controller
                     'class' => VerbFilter::className(),
                     'actions' => [
                         'delete' => ['POST'],
+                        'read' => ['POST'],
+                        'read-all' => ['POST'],
+                        'delete-selected' => ['POST'],
+                        'read-selected' => ['POST'],
                     ],
                 ],
             ]
@@ -44,15 +48,68 @@ class DefaultController extends Controller
 
     public function actionRead($id)
     {
+        $saved = false;
         if ($model = Notification::findModel($id)) {
             if ((int) $model->id_to !== (int) Yii::$app->user->id && !Yii::$app->user->can('notificationWebDefaultUpdate')) {
                 throw new \yii\web\ForbiddenHttpException(Module::t('You are not allowed to access this page.'));
             }
             $model->status = Notification::STATUS_READ;
-            $model->save();
+            $saved = $model->save();
         }
         if (Yii::$app->request->isAjax) {
-            return $this->asJson(['success' => true]);
+            return $this->asJson(['success' => $saved]);
+        }
+        return $this->redirect(['index']);
+    }
+
+    public function actionReadAll()
+    {
+        $count = Notification::markAllRead((int) Yii::$app->user->id);
+        if (Yii::$app->request->isAjax) {
+            return $this->asJson(['success' => true, 'count' => $count]);
+        }
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Marks the checked notifications read (panel bar and the row's button); ids of other users are skipped.
+     */
+    public function actionReadSelected()
+    {
+        $marked = 0;
+        foreach (Notification::find()->where(['id_notification' => $this->selectedIds()])->all() as $model) {
+            if ((int) $model->id_to !== (int) Yii::$app->user->id && !Yii::$app->user->can('notificationWebDefaultUpdate')) {
+                continue;
+            }
+            if ((int) $model->status === Notification::STATUS_UNREAD) {
+                $model->status = Notification::STATUS_READ;
+                if ($model->save(false, ['status'])) {
+                    $marked++;
+                }
+            }
+        }
+        if (Yii::$app->request->isAjax) {
+            return $this->asJson(['success' => true, 'count' => $marked, 'unread' => Notification::countUnread()]);
+        }
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Deletes the checked notifications (panel and list); ids the user may not delete are skipped.
+     */
+    public function actionDeleteSelected()
+    {
+        $deleted = 0;
+        foreach (Notification::find()->where(['id_notification' => $this->selectedIds()])->all() as $model) {
+            if (Yii::$app->user->can('notificationWebDefaultDelete', ['model' => $model]) && $model->delete()) {
+                $deleted++;
+            }
+        }
+        if (Yii::$app->request->isAjax) {
+            return $this->asJson(['success' => true, 'count' => $deleted, 'unread' => Notification::countUnread()]);
+        }
+        if ($deleted > 0) {
+            Yii::$app->session->addFlash('info', Module::t('{n} notifications have been deleted', ['n' => $deleted]));
         }
         return $this->redirect(['index']);
     }
@@ -66,6 +123,10 @@ class DefaultController extends Controller
         if ($notification->status == Notification::STATUS_UNREAD) {
             $notification->status = Notification::STATUS_READ;
             $notification->save();
+        }
+        $url = $notification->hasAttribute('url') ? $notification->url : null;
+        if (Notification::isLocalUrl($url)) {
+            return $this->redirect($url);
         }
         return $this->render('view', [
             'model' => $notification,
@@ -121,5 +182,15 @@ class DefaultController extends Controller
             Yii::$app->session->addFlash('info', Module::t('Notification has been deleted'));
         }
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Ids posted as selection[]; an empty selection matches no record.
+     */
+    private function selectedIds(): array
+    {
+        $ids = array_values(array_filter(array_map('intval', (array) $this->request->post('selection', []))));
+
+        return $ids === [] ? [0] : $ids;
     }
 }

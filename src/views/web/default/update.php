@@ -8,7 +8,7 @@ use portalium\notification\Module;
 
 $this->title = Module::t('Update Notification: {name}', ['name' => $model->title,]);
 $this->params['breadcrumbs'][] = ['label' => Module::t('Notifications'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'id_notification' => $model->id_notification]];
+$this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'id' => $model->id_notification]];
 $this->params['breadcrumbs'][] = Module::t('Update');
 ?>
 

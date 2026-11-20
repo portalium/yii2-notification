@@ -20,8 +20,8 @@ $this->params['breadcrumbs'][] = $this->title;
     'title' => $model->title,
     'actions' => [
         'header' => [
-            Html::a(Module::t(''), ['update', 'id_notification' => $model->id_notification], ['class' => 'fa fa-pencil btn btn-primary']),
-            Html::a(Module::t(''), ['delete', 'id_notification' => $model->id_notification], [
+            Html::a(Module::t(''), ['update', 'id' => $model->id_notification], ['class' => 'fa fa-pencil btn btn-primary']),
+            Html::a(Module::t(''), ['delete', 'id' => $model->id_notification], [
                 'class' => 'fa fa-trash btn btn-danger',
                 'data' => [
                     'confirm' => Module::t('Are you sure you want to delete this item?'),

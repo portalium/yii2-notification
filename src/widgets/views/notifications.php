@@ -3,89 +3,119 @@
 use portalium\notification\bundles\NotificationAsset;
 use portalium\notification\Module;
 use yii\helpers\Html;
+use yii\helpers\Url;
+
+/* @var $this yii\web\View */
+/* @var $notifications portalium\notification\models\Notification[] */
+/* @var $unread int */
 
 NotificationAsset::register($this);
+
+$bellLabel = $unread > 0
+    ? Module::t('Notifications ({n} unread)', ['n' => $unread])
+    : Module::t('Notifications');
+// opens on the unread ones; with none left there is nothing to show there
+$onlyUnread = $unread > 0;
+$formatter = Yii::$app->formatter;
 ?>
+<ul class="nav" id="notification">
+    <li class="nav-item">
+        <button type="button" class="nav-link notification-toggle" data-bs-toggle="offcanvas"
+                data-bs-target="#notification-panel" aria-controls="notification-panel"
+                aria-label="<?= Html::encode($bellLabel) ?>" title="<?= Html::encode($bellLabel) ?>">
+            <span class="notification-bell">
+                <i class="fa fa-bell" aria-hidden="true"></i>
+                <?php if ($unread > 0) : ?>
+                    <span class="badge rounded-pill bg-danger notification-count"><?= $unread ?></span>
+                <?php endif; ?>
+            </span>
+        </button>
+    </li>
+</ul>
 
-<?php
-if (count($notifications) > 0) { ?>
-
-    <ul class="card-box nav" id="notification">
-        <li class="dropdown nav-item">
-            <a class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="#" style="padding-left: 0px !important; padding-right: 0px !important;">
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger marginleft--10px">
-                    <?= count($notifications) ?>
-                    <span class="visually-hidden">unread messages</span>
-                </span>
-                <i class="fa fa-bell" style="padding-left: 20px; padding-right: 20px; margin-top: 3px; color: black !important;"></i>
-            </a>
+<div class="offcanvas offcanvas-end notification-panel<?= $onlyUnread ? ' only-unread' : '' ?>" tabindex="-1" id="notification-panel"
+     aria-labelledby="notification-panel-title"
+     data-read-url="<?= Html::encode(Url::to(['/notification/default/read-selected'])) ?>"
+     data-read-all-url="<?= Html::encode(Url::to(['/notification/default/read-all'])) ?>"
+     data-delete-url="<?= Html::encode(Url::to(['/notification/default/delete-selected'])) ?>"
+     data-delete-confirm="<?= Html::encode(Module::t('Delete the selected notifications?')) ?>"
+     data-delete-one-confirm="<?= Html::encode(Module::t('Delete this notification?')) ?>"
+     data-select-label="<?= Html::encode(Module::t('Select all')) ?>"
+     data-selected-label="<?= Html::encode(Module::t('{n} selected')) ?>"
+     data-label="<?= Html::encode(Module::t('Notifications')) ?>"
+     data-label-unread="<?= Html::encode(Module::t('Notifications ({n} unread)')) ?>">
+    <div class="offcanvas-header notification-panel-header">
+        <h2 class="offcanvas-title" id="notification-panel-title"><?= Module::t('Notifications') ?></h2>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="<?= Html::encode(Module::t('Close')) ?>"></button>
+    </div>
+    <div class="notification-tabs" role="tablist">
+        <button type="button" class="notification-tab<?= $onlyUnread ? ' active' : '' ?>" role="tab" data-filter="unread"
+                aria-selected="<?= $onlyUnread ? 'true' : 'false' ?>">
+            <?= Module::t('Unread') ?> (<span class="notification-tab-count"><?= $unread ?></span>)
+        </button>
+        <button type="button" class="notification-tab<?= $onlyUnread ? '' : ' active' ?>" role="tab" data-filter="all"
+                aria-selected="<?= $onlyUnread ? 'false' : 'true' ?>">
+            <?= Module::t('All') ?>
+        </button>
+        <?= Html::a('<i class="fa fa-external-link" aria-hidden="true"></i>', ['/notification/default/index'], [
+            'class' => 'notification-view-all',
+            'title' => Module::t('View all'),
+            'aria-label' => Module::t('View all'),
+        ]) ?>
+    </div>
+    <div class="notification-select-bar">
+        <label class="notification-select-all">
+            <input class="form-check-input" type="checkbox" id="notification-select-all"<?= empty($notifications) ? ' disabled' : '' ?>>
+            <span class="notification-select-label"><?= Module::t('Select all') ?></span>
+        </label>
+        <div class="notification-select-actions" hidden>
+            <button type="button" class="btn btn-success notification-read-selected">
+                <i class="fa fa-check" aria-hidden="true"></i> <?= Module::t('Mark as read') ?>
+            </button>
+            <button type="button" class="btn btn-danger notification-delete-selected">
+                <i class="fa fa-trash-o" aria-hidden="true"></i> <?= Module::t('Delete') ?>
+            </button>
+        </div>
+    </div>
+    <div class="offcanvas-body notification-panel-body">
+        <?php foreach ($notifications as $notification) : ?>
             <?php
-            echo Html::beginTag('ul', $options);
+            $id = (int) $notification->id_notification;
+            $isUnread = (int) $notification->status === $notification::STATUS_UNREAD;
+            $time = $notification->date_create ? strtotime($notification->date_create . ' UTC') : false;
+            // the text may carry a link for the detail page; the row shows it as plain text
+            $text = trim(html_entity_decode(strip_tags((string) $notification->text), ENT_QUOTES, 'UTF-8'));
             ?>
-            <div class="notification-heading">
-                <span class="menu-title">Notifications</span>
-            </div>
-            <div class="drop-content">
-                <div class="card" role="presentation">
-                    <?php foreach ($notifications as $notification) { ?>
-                        <div class="d-flex flex-row justify-content-between card-notification-item" data-key="<?= $notification->id_notification ?>">
-                            <p class="card notification-content" role="presentation"  style="padding: 8px 0px 8px 17px !important; background: transparent">
-                                <span class="item-title"><?php echo $notification->title ?></span>
-                            </p>
-                            <div class="notification-action">
-                                <a href="/notification/default/view?id=<?= $notification->id_notification ?>" class="btn btn-success btn-sm" style="padding: 5px !important;"><span class="fa fa-search"></span></a>
-                                <span class="btn btn-danger btn-sm" style="padding: 5px !important;" onclick="readNotification(<?= $notification->id_notification ?>)"><span class="fa fa-trash"></span></span>
-                            </div>
-                        </div>
-                    <?php } ?>
+            <div class="notification-row<?= $isUnread ? ' unread' : '' ?>" data-key="<?= $id ?>">
+                <input class="form-check-input notification-row-check" type="checkbox" value="<?= $id ?>"
+                       aria-label="<?= Html::encode(Module::t('Select') . ': ' . $notification->title) ?>">
+                <a class="notification-row-main" href="<?= Html::encode(Url::to(['/notification/default/view', 'id' => $id])) ?>">
+                    <span class="notification-row-title"><?= Html::encode($notification->title) ?></span>
+                    <?php if ($text !== '') : ?>
+                        <span class="notification-row-text"><?= Html::encode($text) ?></span>
+                    <?php endif; ?>
+                </a>
+                <div class="notification-row-side">
+                    <?php if ($time) : ?>
+                        <time class="notification-row-time" datetime="<?= Html::encode(gmdate('c', $time)) ?>"
+                              title="<?= Html::encode($formatter->asDatetime($time, 'php:d.m.Y H:i')) ?>"><?= Html::encode($formatter->asRelativeTime($time)) ?></time>
+                    <?php endif; ?>
+                    <div class="notification-row-actions">
+                        <?php if ($isUnread) : ?>
+                            <button type="button" class="btn btn-success btn-sm notification-row-read" data-id="<?= $id ?>"
+                                    title="<?= Html::encode(Module::t('Mark as read')) ?>" aria-label="<?= Html::encode(Module::t('Mark as read')) ?>">
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                        <button type="button" class="btn btn-danger btn-sm notification-row-delete" data-id="<?= $id ?>"
+                                title="<?= Html::encode(Module::t('Delete')) ?>" aria-label="<?= Html::encode(Module::t('Delete')) ?>">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="notification-footer">
-                <a href="/notification/default/index?" style="padding-left: 10px !important; width: 100%; display: flex; float: none; text-align: center; align-items: center;">
-                    <span class="menu-title-footer">View all</span>
-                </a>
-            </div>
-            <?php
-            echo Html::endTag('ul');
-            ?>
-        </li>
-    </ul>
-<?php
-
-} else {
-    echo Html::beginTag('ul', ['class' => 'nav nav-link']);
-    echo Html::tag('i', '', ['class' => 'fa fa-bell-slash remove-after', 'style' => 'padding-left: 2px; padding-top:5px;']);
-    echo Html::endTag('ul');
-}
-?>
-
-<?php
-$js = <<<JS
-    function readNotification(id) {
-        $.ajax({
-            url: '/notification/default/read?id=' + id,
-            type: 'GET',
-            success: function (data) {
-                if (data.success) {
-                    let notification = $('#notification');
-                    let notificationItem = notification.find('[data-key=' + id + ']');
-                    notificationItem.remove();
-                    let notificationCount = notification.find('.badge');
-                    let count = parseInt(notificationCount.text());
-                    notificationCount.text(count - 1);
-                    if (count - 1 === 0) {
-                        notificationCount.remove();
-                        $('#notification').html('<i class="fa fa-bell-slash" style="padding-left: 20px; padding-right: 20px; margin-top: 10px;"></i>');
-                    }
-                }
-            }
-        });
-    }
-    $(document).ready(function () {
-        $('#notification ul').on('click', function (e) {
-            e.stopPropagation();
-        });
-    });
-JS;
-$this->registerJs($js, \yii\web\View::POS_BEGIN);
-?>
+        <?php endforeach; ?>
+        <p class="notification-empty"<?= empty($notifications) ? '' : ' hidden' ?>><?= Module::t('No notifications yet.') ?></p>
+        <p class="notification-empty-unread" hidden><?= Module::t('No unread notifications.') ?></p>
+    </div>
+</div>

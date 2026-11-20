@@ -13,6 +13,10 @@ class NotificationAsset extends AssetBundle
         'css/notification.css',
     ];
 
+    public $js = [
+        'js/notification.js',
+    ];
+
     public $publishOptions = [
         'forceCopy' => YII_DEBUG,
     ];

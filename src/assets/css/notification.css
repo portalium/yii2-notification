@@ -1,117 +1,251 @@
+/* Bell in the top menu */
 
-.dropdown-menu.notify-drop {
-    min-width: 330px;
-    background-color: #fff;
-    min-height:auto;
-    padding: 0px;
-    border-radius: 0;
+#notification .notification-toggle {
+    background: none;
+    border: 0;
+    cursor: pointer;
 }
 
-.drop-content {
-    min-height: 52px;
-    max-height: 200px;
-    overflow-y: auto;
-    padding-top: 7px;
+#notification .notification-toggle:focus-visible {
+    outline: 2px solid var(--nv-success, #1f8a3c);
+    outline-offset: 2px;
 }
 
-.notification-heading {
-    padding:5px 10px;
-    color: black;
-    background-color: white;
-    border-bottom: 1px solid #ccc;
+/* the count sits on the bell's top right corner */
+#notification .notification-bell {
+    position: relative;
+    display: inline-block;
 }
-.notification-footer  {
-    color: black;
-    background-color: white;
-    border-top: 1px solid #ccc;
-    width: 100%;
-    height: 30.4px;
+
+#notification .notification-count {
+    position: absolute;
+    top: -8px;
+    left: 100%;
+    transform: translateX(-50%);
+    padding: 2px 5px;
+}
+
+/* Panel: full height, from the right edge */
+
+.notification-panel {
+    --notification-line: var(--nv-border, #e6e9e5);
+    --notification-muted: var(--nv-muted, #5c6860);
+    --notification-active: var(--nv-ink, #1d2420);
+    --notification-hover: var(--nv-hover-bg, #f3f5f2);
+    width: 440px !important;
+    max-width: 100vw;
+    font-size: 14px;
+}
+
+/* Until notification.js moves it to <body>, the panel sits in the top menu, where Bootstrap shows any offcanvas
+   inline (.navbar-expand-lg .offcanvas): it flashed open on every page load. */
+.navbar .notification-panel {
+    display: none;
+}
+
+.notification-panel .notification-panel-header {
+    padding: 20px 20px 12px;
+}
+
+.notification-panel-header .offcanvas-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Unread (n) / All: an underline marks the open one */
+
+.notification-tabs {
     display: flex;
+    gap: 8px;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--notification-line);
 }
 
-#notification .menu-title {
-    color:black;
-    font-size:18px;
-    display:inline-block;
-    margin-bottom: 0px;
-    margin-top: 0px;
-    font-size: inherit;
-    font-weight: inherit;
+.notification-tab {
+    padding: 10px 12px;
+    background: none;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+    color: var(--notification-muted);
+    cursor: pointer;
 }
 
-#notification .item-title {
-    font-size: inherit;
-    font-weight: inherit;
-    color:#000;
+.notification-tab:hover {
+    color: var(--notification-active);
+}
+
+.notification-tab.active {
+    color: var(--notification-active);
+    font-weight: 600;
+    border-bottom-color: var(--notification-active);
+}
+
+/* the full list page, where the gear sits in other panels */
+.notification-view-all {
+    margin-left: auto;
+    align-self: center;
+    padding: 6px 8px;
+    color: var(--notification-muted);
+    font-size: 16px;
+}
+
+.notification-view-all:hover {
+    color: var(--notification-active);
+}
+
+.notification-tab:focus-visible {
+    outline: 2px solid var(--nv-success, #1f8a3c);
+    outline-offset: -2px;
+}
+
+/* Select all; with a selection the actions show next to it */
+
+.notification-select-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    min-height: 49px;
+    padding: 8px 20px;
+    border-bottom: 1px solid var(--notification-line);
+}
+
+.notification-select-all {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.notification-select-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.notification-select-actions[hidden] {
+    display: none;
+}
+
+.notification-panel .notification-select-all .form-check-input,
+.notification-panel .notification-row-check {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Rows */
+
+.notification-panel .notification-panel-body {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+.notification-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--notification-line);
+}
+
+.notification-row:hover,
+.notification-row:focus-within {
+    background: var(--notification-hover);
+}
+
+.notification-panel .notification-row-check {
+    margin-top: 2px;
+}
+
+.notification-row-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.notification-row-main:hover {
+    color: inherit;
+}
+
+.notification-row-title {
+    overflow-wrap: anywhere;
+}
+
+.notification-row.unread .notification-row-title {
+    font-weight: 600;
+}
+
+.notification-row-text {
+    color: var(--notification-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 205px;
 }
 
-#notification .notification-action {
-    display: flex;
+/* time on the right; on hover (or keyboard focus) the row's buttons take its place.
+   Both sit in the same grid cell and only their visibility changes, so the column keeps
+   its width and the title/text next to it do not reflow. */
+.notification-row-side {
+    flex: 0 0 auto;
+    display: grid;
     align-items: center;
-    justify-content: space-between;
-    width: 68px;
-    padding-right: 20px;
+    justify-items: end;
+    min-height: 31px;
 }
 
-#notification .item-info {
-    font-size: inherit;
-    font-weight: inherit;
-    margin-top:-10px;
-    margin-bottom:-5px;
+.notification-row-time,
+.notification-row-actions {
+    grid-area: 1 / 1;
 }
 
-.notifications-wrapper {
-    overflow:auto;
-    max-height:250px;
+.notification-row-time {
+    color: var(--notification-muted);
+    white-space: nowrap;
 }
 
-
-
-
-#notification .card{
-    margin: 0;
-    border:0;
+.notification-row-actions {
+    display: flex;
+    gap: 6px;
+    visibility: hidden;
 }
 
-
-#notification .dropdown-divider {
-    margin-left:10px;
-    border-top: 1px solid #e9ecef;
-}
-.card-notification-item:hover {
-    background-color: #ccc;
-}
-#notification .menu-title-footer {
-    color:black;
-    font-size:18px;
-    display:inline-block;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    font-size: inherit;
-    font-weight: inherit;
+.notification-row:hover .notification-row-actions,
+.notification-row:focus-within .notification-row-actions {
+    visibility: visible;
 }
 
-/* .notification-footer a {
-    padding: 0px !important;
-} */
-
-#notification .card-box{
-    padding-top: 6px;
+.notification-row:hover .notification-row-time,
+.notification-row:focus-within .notification-row-time {
+    visibility: hidden;
 }
 
-#notification .position-absolute.top-0.start-100.translate-middle.badge {
-    margin-left: -16px;
+/* touch screens have no hover: the buttons stay */
+@media (hover: none) {
+    .notification-row-actions {
+        visibility: visible;
+    }
+
+    .notification-row-time {
+        display: none;
+    }
 }
 
-#notification span {
-    top: 7px !important;
+.notification-panel.only-unread .notification-row:not(.unread) {
+    display: none;
 }
 
-#notification .fa-bell {
-    padding-top: 7px;
+.notification-empty,
+.notification-empty-unread {
+    margin: 20px;
+    color: var(--notification-muted);
 }
-
