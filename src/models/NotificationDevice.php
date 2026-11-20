@@ -137,7 +137,7 @@ class NotificationDevice extends ActiveRecord
     }
 
     /**
-     * Device tiplerinin listesi
+     * List for Device Types
      */
     public static function getDeviceTypes()
     {
@@ -149,7 +149,7 @@ class NotificationDevice extends ActiveRecord
     }
 
     /**
-     * Kullanıcının aktif cihazlarını getirir
+     * List for Active Devices by User
      */
     public static function getActiveDevicesByUser($userId, $workspaceId = null)
     {
@@ -164,7 +164,7 @@ class NotificationDevice extends ActiveRecord
     }
 
     /**
-     * Kullanıcının aktif device token'larını getirir
+     * List for Active Device Tokens by User
      */
     public static function getActiveTokensByUser($userId, $workspaceId = null, $deviceType = null)
     {
@@ -184,7 +184,7 @@ class NotificationDevice extends ActiveRecord
     }
 
     /**
-     * Device'ı deaktive et
+     * List for Deactivating a Device
      */
     public static function deactivateDevice($deviceToken, $userId = null, $workspaceId = null)
     {
@@ -202,7 +202,7 @@ class NotificationDevice extends ActiveRecord
     }
 
     /**
-     * Kullanıcının tüm cihazlarını deaktive et
+     * List for Deactivating All User Devices
      */
     public static function deactivateAllUserDevices($userId, $workspaceId = null)
     {
@@ -216,7 +216,7 @@ class NotificationDevice extends ActiveRecord
     }
 
     /**
-     * Eski/kullanılmayan cihazları temizle
+     * List for Cleaning Up Old Devices
      */
     public static function cleanupOldDevices($days = 30)
     {
@@ -232,6 +232,15 @@ class NotificationDevice extends ActiveRecord
         );
     }
 
+    public function removeSameDeviceTokens()
+    {
+        if (empty($this->device_token)) {
+            return;
+        }
+
+        self::deleteAll(['device_token' => $this->device_token]);
+    }
+
     public function beforeValidate()
     {
         if (parent::beforeValidate()) {
@@ -239,6 +248,20 @@ class NotificationDevice extends ActiveRecord
                 $this->id_user = Yii::$app->user->id;
                 $this->id_workspace = Yii::$app->workspace->id;
             }
+            return true;
+        }
+        return false;
+    }
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if (!$this->isNewRecord) {
+                $this->last_used_at = date("Y-m-d H:i:s");
+            }
+
+            $this->removeSameDeviceTokens();
+
             return true;
         }
         return false;
