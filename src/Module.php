@@ -6,6 +6,7 @@ class Module extends \portalium\base\Module
 {
     public static $name = 'notification';
 
+    public static $icon = 'bell';
     public $apiRules = [
         [
             'class' => 'yii\rest\UrlRule',
